@@ -1,11 +1,14 @@
 package com.example.chinczyk;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 
 import java.io.File;
@@ -15,19 +18,26 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.ResourceBundle;
 
-public class BoardController implements Initializable {
+public class BoardController extends ActionEvent implements Initializable {
     @FXML
     GridPane GameGrid;
     @FXML
     private Button test;
     @FXML
     private ImageView dice_roll;
+    @FXML
+    private ImageView red_1, red2, red3, red4;
+    //private ImageView green_1, red2, red3, red4;
+    //private ImageView red_1, red2, red3, red4;
+    //private ImageView red_1, red2, red3, red4;
 
     private ArrayList<Field> fields = new ArrayList<Field>();
     private ArrayList<Pawn> red = new ArrayList<Pawn>();
     private ArrayList<Pawn> green = new ArrayList<Pawn>();
     private ArrayList<Pawn> blue = new ArrayList<Pawn>();
     private ArrayList<Pawn> yellow = new ArrayList<Pawn>();
+    private int random = 0;
+
 
 
     @Override
@@ -36,6 +46,13 @@ public class BoardController implements Initializable {
         createPawns();
         System.out.println(red.get(2).getField().toString());
 
+        red_1.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            if(random == 6)
+            {
+
+            }
+            event.consume();
+        });
 
 
     }
@@ -49,11 +66,6 @@ public class BoardController implements Initializable {
 
     }
 
-    @FXML
-    protected void movePawn()
-    {
-
-    }
 
     private Node getNodeFromGridPane(GridPane gridPane, int col, int row) {
         for (Node node : gridPane.getChildren()) {
@@ -136,13 +148,13 @@ public class BoardController implements Initializable {
     private int diceRoll()
     {
         Random r = new Random();
-        int random = r.nextInt(1,6);
+        random = r.nextInt(1,6);
 
         return random;
     }
 
     @FXML
-    private void swapImage() throws MalformedURLException {
+    private void swapImage() {
         int random = diceRoll();
 
         Image image;
@@ -174,6 +186,25 @@ public class BoardController implements Initializable {
                 dice_roll.setImage(image);
                 break;
         }
+    }
+/*
+    private boolean outOfBase(String color)
+    {
+        if(random == 6 && checkBase("red_1"))
+        {
+            return true;
+        }
+
+    }
+
+    private boolean checkBase(String color)
+    {
+
+    }
+*/
+    @FXML
+    private void movePawn()
+    {
     }
 
 

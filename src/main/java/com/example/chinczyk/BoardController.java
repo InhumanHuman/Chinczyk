@@ -18,18 +18,16 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.ResourceBundle;
 
-public class BoardController extends ActionEvent implements Initializable {
+public class BoardController implements Initializable {
     @FXML
     GridPane GameGrid;
     @FXML
-    private Button test;
-    @FXML
     private ImageView dice_roll;
     @FXML
-    private ImageView red_1, red2, red3, red4;
-    //private ImageView green_1, red2, red3, red4;
-    //private ImageView red_1, red2, red3, red4;
-    //private ImageView red_1, red2, red3, red4;
+    private ImageView red_1, red_2, red_3, red_4;
+    private ImageView green_1, green_2, green_3, green_4;
+    private ImageView blue_1, blue_2, blue_3, blue_4;
+    private ImageView yellow_1, yellow_2, yellow_3, yellow_4;
 
     private ArrayList<Field> fields = new ArrayList<Field>();
     private ArrayList<Pawn> red = new ArrayList<Pawn>();
@@ -45,6 +43,13 @@ public class BoardController extends ActionEvent implements Initializable {
 
         createPawns();
         System.out.println(red.get(2).getField().toString());
+
+        EventHandler<MouseEvent> mouseEventHandler = mouseEvent ->
+        {
+        };
+        red_1.setOnMouseClicked(mouseEventHandler);
+
+
 
         red_1.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if(random == 6)

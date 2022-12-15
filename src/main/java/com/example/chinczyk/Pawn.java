@@ -10,7 +10,7 @@ public class Pawn {
 
     public Pawn(String color, String name, Field field) {
         this.color = color;
-        this.fieldNumber = 99;
+        this.fieldNumber = -1;
         this.name = name;
         this.field = field;
         this.isFinished = false;

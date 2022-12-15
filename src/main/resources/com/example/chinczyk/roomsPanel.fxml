@@ -1,14 +1,120 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Text?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.example.chinczyk.RoomsPanelController"
-            prefHeight="400.0" prefWidth="600.0">
-
+<AnchorPane prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.chinczyk.RoomsPanelController">
+   <children>
+      <Accordion layoutX="199.0" layoutY="85.0">
+        <panes>
+          <TitledPane animated="false" text="Room1">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Button fx:id="joinButton1" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
+                        <ListView layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </TitledPane>
+            <TitledPane animated="false" text="Room2">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                         <Button fx:id="joinButton2" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
+                        <ListView layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </TitledPane>
+            <TitledPane animated="false" text="Room3">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                         <Button fx:id="joinButton3" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
+                        <ListView layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </TitledPane>
+            <TitledPane animated="false" text="Room4">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                         <Button fx:id="joinButton4" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
+                        <ListView layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </TitledPane>
+            <TitledPane animated="false" text="Room5">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                         <Button fx:id="joinButton5" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
+                        <ListView layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </TitledPane>
+            <TitledPane animated="false" text="Room6">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                         <Button fx:id="joinButton6" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
+                        <ListView layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </TitledPane>
+            <TitledPane animated="false" text="Room7">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                         <Button fx:id="joinButton7" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
+                        <ListView layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </TitledPane>
+            <TitledPane animated="false" text="Room8">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                         <Button fx:id="joinButton8" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
+                        <ListView layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </TitledPane>
+            <TitledPane animated="false" text="Room9">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                         <Button fx:id="joinButton9" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
+                        <ListView layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </TitledPane>
+            <TitledPane animated="false" text="Room10">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                         <Button fx:id="joinButton10" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
+                        <ListView layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </TitledPane>
+        </panes>
+      </Accordion>
+      <Text layoutX="261.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Room list" wrappingWidth="78.833984375" />
+      <Text layoutX="14.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Your username:" />
+      <Text layoutX="106.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" />
+   </children>
 </AnchorPane>

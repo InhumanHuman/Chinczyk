@@ -1,11 +1,9 @@
 package com.example.chinczyk;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 public class Client {
     protected Socket client;
@@ -15,9 +13,9 @@ public class Client {
 
     public Client(String hostName, int ip, String username)
     {
-
         try {
             this.client = new Socket(hostName, ip);
+            System.out.println(client.getInetAddress());
             this.in = new BufferedReader(new InputStreamReader(this.client.getInputStream()));
             this.out = new PrintWriter(client.getOutputStream());
             this.username = username;
@@ -37,8 +35,9 @@ public class Client {
         out.println(message);
         out.flush();
     }
-    public void readFromServer()
+    public void sendToServerObject(ArrayList<ArrayList<Client>> clients)
     {
-
+        out.println(clients);
+        out.flush();
     }
 }

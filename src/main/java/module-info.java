@@ -4,6 +4,8 @@ module com.example.chinczyk {
 
     requires org.kordamp.bootstrapfx.core;
 
+    requires java.sql;
+
     opens com.example.chinczyk to javafx.fxml;
     exports com.example.chinczyk;
 }

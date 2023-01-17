@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.chinczyk.RoomsPanelController">
+<AnchorPane fx:id="ap" prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.chinczyk.RoomsPanelController">
    <children>
       <Accordion layoutX="199.0" layoutY="85.0">
         <panes>
@@ -15,8 +15,8 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <Button fx:id="joinButton1" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
-                        <ListView layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
+                        <Button fx:id="joinButton0" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
+                        <ListView fx:id="playersListView0" layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
                      </children>
                   </AnchorPane>
             </content>
@@ -25,8 +25,8 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                         <Button fx:id="joinButton2" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
-                        <ListView layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
+                         <Button fx:id="joinButton1" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
+                        <ListView fx:id="playersListView1" layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
                      </children>
                   </AnchorPane>
                </content>
@@ -35,8 +35,8 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                         <Button fx:id="joinButton3" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
-                        <ListView layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
+                         <Button fx:id="joinButton2" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
+                        <ListView fx:id="playersListView2" layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
                      </children>
                   </AnchorPane>
                </content>
@@ -45,8 +45,8 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                         <Button fx:id="joinButton4" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
-                        <ListView layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
+                         <Button fx:id="joinButton3" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
+                        <ListView fx:id="playersListView3" layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
                      </children>
                   </AnchorPane>
                </content>
@@ -55,8 +55,8 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                         <Button fx:id="joinButton5" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
-                        <ListView layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
+                         <Button fx:id="joinButton4" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
+                        <ListView fx:id="playersListView4" layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
                      </children>
                   </AnchorPane>
                </content>
@@ -65,8 +65,8 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                         <Button fx:id="joinButton6" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
-                        <ListView layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
+                         <Button fx:id="joinButton5" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
+                        <ListView fx:id="playersListView5" layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
                      </children>
                   </AnchorPane>
                </content>
@@ -75,8 +75,8 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                         <Button fx:id="joinButton7" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
-                        <ListView layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
+                         <Button fx:id="joinButton6" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
+                        <ListView fx:id="playersListView6" layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
                      </children>
                   </AnchorPane>
                </content>
@@ -85,8 +85,8 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                         <Button fx:id="joinButton8" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
-                        <ListView layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
+                         <Button fx:id="joinButton7" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
+                        <ListView fx:id="playersListView7" layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
                      </children>
                   </AnchorPane>
                </content>
@@ -95,8 +95,8 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                         <Button fx:id="joinButton9" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
-                        <ListView layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
+                         <Button fx:id="joinButton8" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
+                        <ListView fx:id="playersListView8" layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
                      </children>
                   </AnchorPane>
                </content>
@@ -105,8 +105,8 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                         <Button fx:id="joinButton10" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
-                        <ListView layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
+                         <Button fx:id="joinButton9" layoutX="64.0" layoutY="141.0" mnemonicParsing="false" onAction="#joinRoom" text="Join Room" />
+                        <ListView fx:id="playersListView9" layoutX="-1.0" prefHeight="122.0" prefWidth="202.0" />
                      </children>
                   </AnchorPane>
                </content>
@@ -114,7 +114,5 @@
         </panes>
       </Accordion>
       <Text layoutX="261.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Room list" wrappingWidth="78.833984375" />
-      <Text layoutX="14.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Your username:" />
-      <Text layoutX="106.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" />
    </children>
 </AnchorPane>

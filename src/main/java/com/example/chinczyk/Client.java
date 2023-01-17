@@ -11,27 +11,34 @@ public class Client {
     protected Socket client;
     protected BufferedReader in;
     protected PrintWriter out;
+    protected String username;
 
-    public static void main(String[] args) {
-        new Client("127.0.0.1", 1200);
-    }
+    public Client(String hostName, int ip, String username)
+    {
 
-    public Client(String hostName, int ip) {
-        String line;
         try {
             this.client = new Socket(hostName, ip);
             this.in = new BufferedReader(new InputStreamReader(this.client.getInputStream()));
             this.out = new PrintWriter(client.getOutputStream());
-            while (true) {
-                out.println("Test polaczenia #2");
-                out.flush();
-                line = in.readLine();
-                System.out.println(line);
-            }
+            this.username = username;
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+    }
+    public String getUsername() {
+        return username;
+    }
+
+    public void sendToServer(String message)
+    {
+        out.println(message);
+        out.flush();
+    }
+    public void readFromServer()
+    {
+
     }
 }

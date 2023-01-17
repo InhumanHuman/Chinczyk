@@ -31,7 +31,7 @@ public class SetUsernamePanel implements Initializable {
         clientSendUsername.setOnAction(event -> {
             username = clientUsername.getText();
             //stworz klienta i przekaz go do roomspanel
-            Client client = new Client("127.0.0.1", 1200);
+            Client client = new Client("127.0.0.1", 1200, username);
             Parent root = null;
             FXMLLoader loader = new FXMLLoader(SetUsernamePanel.class.getResource("roomsPanel.fxml"));
             try {
@@ -41,7 +41,7 @@ public class SetUsernamePanel implements Initializable {
             }
             RoomsPanelController roomsPanelController = loader.getController();
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setUserData(username);
+            stage.setUserData(client);
             stage.setTitle("Pokoje");
             stage.setScene(new Scene(root, 900,600));
             stage.show();

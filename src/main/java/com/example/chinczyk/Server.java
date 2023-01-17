@@ -13,24 +13,25 @@ import java.util.List;
 public class Server {
     public static void main(String[] args) {
         try {
-            List<List<Integer>> playersInRooms;
-            List<ClientHandler> clients;
+            // Stworzenie pustej tablicy 2 wymiarowej pokoi
+
+            PlayersInRooms playersInRooms = new PlayersInRooms();
+            playersInRooms.addLists();
+
+            List<Socket> clients;
             Socket client;
             ServerSocket server;
             server = new ServerSocket(1200);
             System.out.println("New server initialized!");
 
             clients = Collections.synchronizedList(new ArrayList<>());
-            playersInRooms = Collections.synchronizedList(new ArrayList<>());
-            for (int i = 0; i < 10; i++) {
-                List<Integer> roomList = Collections.synchronizedList(new ArrayList<>());
-                playersInRooms.add(roomList);
-            }
+
             while(true)
             {
                 client = server.accept();
+                clients.add(client);
                 System.out.println("Ustanowiono polaczenie");
-                ServerThread st = new ServerThread(client, clients, playersInRooms);
+                ServerThread st = new ServerThread(client, clients);
                 st.start();
             }
         } catch (Exception e) {
@@ -41,20 +42,21 @@ public class Server {
 
 class ServerThread extends Thread
 {
-    private List<List<Integer>> playersInRooms;
-    private List<ClientHandler> clients;
+    private List<Socket> clients;
     private Socket client;
     private BufferedReader in;
     private PrintWriter out;
+    final String joined_room = "Joined_Room";
 
-    ServerThread(Socket client, List<ClientHandler> clients, List<List<Integer>> playersInRooms)
+    ServerThread(Socket client, List<Socket> clients)
     {
         this.client = client;
         this.clients = clients;
-        this.playersInRooms = playersInRooms;
     }
 
     public void run() {
+        // TODO - poakzanie przez watek nowemu klientowi klientów ktorzy sa juz w pokojach
+        // TODO - sprawdzanie czy klient juz taki istnieje pdoczas podawania nicku
         String line;
         try {
             this.in = new BufferedReader(new InputStreamReader(this.client.getInputStream()));
@@ -64,21 +66,32 @@ class ServerThread extends Thread
         }
         while (true) {
             try {
+                for(List<String> item : PlayersInRooms.playersInRooms)
+                {
+                    System.out.println(item);
+                }
                 line = in.readLine();
-                System.out.println(line);
-                out.println("Test polaczenia #1");
-                out.flush();
+
+
+                String splited[] = line.split(",");
+
+                String msg_p1 = splited[0];
+                String msg_p2 = splited[1];
+                String msg_p3 = splited[2];
+
+                if(msg_p1.equals(joined_room))
+                {
+                    System.out.println("WCHODZE");
+                    int room = Integer.parseInt(msg_p2);
+                    PlayersInRooms.playersInRooms.get(room).add(msg_p3);
+
+                    RoomsPanelController roomsPanelController = new RoomsPanelController();
+
+                    roomsPanelController.updateRooms();
+                }
+
+
             } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                ClientHandler newClient = new ClientHandler(client);
-                clients.add(newClient);
-                // tutaj trzeba czekac na moment az cos przyjdzie do serwera od klienta
-               //new SendMessage(clients);
-
-
-            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

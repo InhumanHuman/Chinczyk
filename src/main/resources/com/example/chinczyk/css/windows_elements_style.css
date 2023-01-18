@@ -2,6 +2,8 @@
 {
     -fx-background-color : #A882DD;
 //-fx-background-color : #DBC2CF
+-fx-border-width: 1px 1px 1px 1px;
+    -fx-border-color : #5702C7;
 }
 
 /* button styling */
@@ -34,4 +36,26 @@
 .Text
 {
     -fx-text-fill : #FFFFFF;
+}
+
+.titled-pane > *.content {
+    -fx-border-color: transparent;
+}
+
+.titled-pane > .title
+{
+    -fx-background-color: -fx-box-border, -fx-inner-border, -fx-body-color, #C296FF;
+    -fx-border-color : #A882DD;
+    -fx-inner-border : #5702C7;
+
+    -fx-border-width: 1px 1px 1px 1px;
+    -fx-background-insets: 0, 1, 2;
+//-fx-background-radius: 5 5 0 0, 4 4 0 0, 3 3 0 0;
+    -fx-padding: 0.166667em 0.833333em 0.25em 0.833333em; /* 2 10 3 10 */
+}
+
+.ListView
+{
+    -fx-border-color : #5702C7;
+    -fx-background-color : #A882DD;
 }

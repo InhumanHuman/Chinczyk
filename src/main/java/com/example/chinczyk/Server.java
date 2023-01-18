@@ -65,13 +65,6 @@ class ServerThread extends Thread {
                 }
                 line = in.readLine();
 
-
-                String splited[] = line.split(",");
-
-                String msg_p1 = splited[0];
-                String msg_p2 = splited[1];
-                String msg_p3 = splited[2];
-
             } catch (IOException e) {
                 e.printStackTrace();
             }

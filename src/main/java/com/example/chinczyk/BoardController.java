@@ -10,6 +10,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -36,6 +37,10 @@ public class BoardController implements Initializable {
     private ArrayList<Pawn> yellow = new ArrayList<Pawn>();
     private int random = 0;
 
+    private ClientGame clientGame;
+    private Stage myStage;
+    private int userID;
+    private int turnNumber = 1;
 
 
     @Override
@@ -58,9 +63,18 @@ public class BoardController implements Initializable {
             }
             event.consume();
         });
-
-
     }
+
+    @FXML
+    protected void getClient(ActionEvent event)
+    {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        clientGame = (ClientGame) stage.getUserData();
+
+        userID = clientGame.getID();
+        System.out.println("Board : " + userID);
+    }
+
 
 
     @FXML
@@ -160,36 +174,41 @@ public class BoardController implements Initializable {
 
     @FXML
     private void swapImage() {
-        int random = diceRoll();
+        // TODO - naprawa ID Board zeby byly dobre ID,
+        //  Wysylanie tury, Wysylanie kostki
+        //  Zablokowanie kostki po nacisnieciu
+        if(turnNumber % 4 == userID) {
 
-        Image image;
+            int random = diceRoll();
 
-        switch (random)
-        {
-            case 1:
-                image = new Image(getClass().getResourceAsStream("dice_1_80x80.png"));
-                dice_roll.setImage(image);
-                break;
-            case 2:
-                image = new Image(getClass().getResourceAsStream("dice_2_80x80.png"));
-                dice_roll.setImage(image);
-                break;
-            case 3:
-                image = new Image(getClass().getResourceAsStream("dice_3_80x80.png"));
-                dice_roll.setImage(image);
-                break;
-            case 4:
-                image = new Image(getClass().getResourceAsStream("dice_4_80x80.png"));
-                dice_roll.setImage(image);
-                break;
-            case 5:
-                image = new Image(getClass().getResourceAsStream("dice_5_80x80.png"));
-                dice_roll.setImage(image);
-                break;
-            case 6:
-                image = new Image(getClass().getResourceAsStream("dice_6_80x80.png"));
-                dice_roll.setImage(image);
-                break;
+            Image image;
+
+            switch (random) {
+                case 1:
+                    image = new Image(getClass().getResourceAsStream("dice_1_80x80.png"));
+                    dice_roll.setImage(image);
+                    break;
+                case 2:
+                    image = new Image(getClass().getResourceAsStream("dice_2_80x80.png"));
+                    dice_roll.setImage(image);
+                    break;
+                case 3:
+                    image = new Image(getClass().getResourceAsStream("dice_3_80x80.png"));
+                    dice_roll.setImage(image);
+                    break;
+                case 4:
+                    image = new Image(getClass().getResourceAsStream("dice_4_80x80.png"));
+                    dice_roll.setImage(image);
+                    break;
+                case 5:
+                    image = new Image(getClass().getResourceAsStream("dice_5_80x80.png"));
+                    dice_roll.setImage(image);
+                    break;
+                case 6:
+                    image = new Image(getClass().getResourceAsStream("dice_6_80x80.png"));
+                    dice_roll.setImage(image);
+                    break;
+            }
         }
     }
 /*

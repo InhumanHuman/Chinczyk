@@ -8,7 +8,7 @@ import java.net.Socket;
 
 public class ClientHandler {
     protected Socket client;
-    protected PrintWriter out; // to co przyszło z socketu trafia do klienta
+    protected PrintWriter out;// to co przyszło z socketu trafia do klienta
     protected BufferedReader in; // to co ma wysłać trafia na socket
 
     public ClientHandler(Socket client) {
@@ -20,4 +20,5 @@ public class ClientHandler {
             e.printStackTrace();
         }
     }
+
 }

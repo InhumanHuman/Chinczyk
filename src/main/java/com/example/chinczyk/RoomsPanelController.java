@@ -286,6 +286,8 @@ public class RoomsPanelController implements Initializable {
             ResultSet resultSet = checkGameServers.executeQuery();
             resultSet.next();
             int serverStatus = resultSet.getInt("empty");
+
+
             if (serverStatus == 1) {
                 Thread t = new Thread(() -> {
                     ServerGame serverGame = new ServerGame(port);
@@ -296,7 +298,12 @@ public class RoomsPanelController implements Initializable {
                 updateServerStatus.setInt(1, 1400 + room_number);
                 updateServerStatus.executeUpdate();
                 client.closeConnection();
-                ClientGame clientGame = new ClientGame("127.0.0.1", port, clientName);
+                PreparedStatement getClientCount = connection.prepareStatement("SELECT free_spots FROM rooms WHERE room_id = ?");
+                getClientCount.setInt(1,room_number);
+                ResultSet usersCount = getClientCount.executeQuery();
+                usersCount.next();
+                int playerID = 4 - usersCount.getInt("free_spots");
+                ClientGame clientGame = new ClientGame("127.0.0.1", port, clientName, playerID);
 
                 Parent root = null;
                 FXMLLoader loader = new FXMLLoader(RoomsPanelController.class.getResource("GamePanel.fxml"));
@@ -307,13 +314,19 @@ public class RoomsPanelController implements Initializable {
                 }
                 BoardController GamePanelController = loader.getController();
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                stage.setUserData(clientGame);
                 stage.setTitle("Gra");
                 stage.setScene(new Scene(root, 600,600));
                 stage.show();
             } else {
                 System.out.println("joined game");
                 client.closeConnection();
-                ClientGame clientGame = new ClientGame("127.0.0.1", port, clientName);
+                PreparedStatement getClientCount = connection.prepareStatement("SELECT free_spots FROM rooms WHERE room_id = ?");
+                getClientCount.setInt(1,room_number);
+                ResultSet usersCount = getClientCount.executeQuery();
+                usersCount.next();
+                int playerID = 4 - usersCount.getInt("free_spots");
+                ClientGame clientGame = new ClientGame("127.0.0.1", port, clientName, playerID);
 
                 Parent root = null;
                 FXMLLoader loader = new FXMLLoader(RoomsPanelController.class.getResource("GamePanel.fxml"));
@@ -324,6 +337,7 @@ public class RoomsPanelController implements Initializable {
                 }
                 BoardController GamePanelController = loader.getController();
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                stage.setUserData(clientGame);
                 stage.setTitle("Gra");
                 stage.setScene(new Scene(root, 600,600));
                 stage.show();

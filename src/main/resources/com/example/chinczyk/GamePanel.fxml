@@ -187,6 +187,7 @@
             <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="6" GridPane.rowIndex="10" />
             <Button fx:id="test" mnemonicParsing="false" onAction="#onHelloButtonClick" text="Button" GridPane.columnIndex="2" GridPane.rowIndex="8" />
             <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <Button fx:id="startGame" mnemonicParsing="false" onAction="#getClient" text="Start" GridPane.columnIndex="3" GridPane.rowIndex="8" />
          </children>
       </GridPane>
       <ImageView fx:id="dice_roll" fitHeight="80.0" fitWidth="80.0" layoutX="375.0" layoutY="145.0" onMouseClicked="#swapImage" pickOnBounds="true" preserveRatio="true">

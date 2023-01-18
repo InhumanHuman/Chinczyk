@@ -43,7 +43,7 @@ public class SetUsernamePanel implements Initializable {
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setUserData(client);
             stage.setTitle("Pokoje");
-            stage.setScene(new Scene(root, 900,600));
+            stage.setScene(new Scene(root, 420,650));
             stage.show();
 
 

@@ -22,8 +22,7 @@ public class SendMessage extends Thread {
         }
         try {
             if (clients.size() > 0) {
-                this.console = new BufferedReader(new InputStreamReader(
-                        System.in)); // pobierz z konsoli co wyslac
+                this.console = new BufferedReader(new InputStreamReader(System.in)); // pobierz z konsoli co wyslac
                 while ((this.userInput = console.readLine()) != null) {
                     if (userInput != null & userInput.length() > 0) {
                         for (ClientHandler client : clients) { // dla kazdego klienta z listy

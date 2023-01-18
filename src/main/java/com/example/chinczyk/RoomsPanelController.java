@@ -293,22 +293,38 @@ public class RoomsPanelController implements Initializable {
                     ServerGame serverGame = new ServerGame(port);
                 });
                 t.start();
+
                 System.out.println("new server for game");
                 PreparedStatement updateServerStatus = connection.prepareStatement("UPDATE game_servers SET `empty` = 0 WHERE port = ?");
                 updateServerStatus.setInt(1, 1400 + room_number);
                 updateServerStatus.executeUpdate();
                 client.closeConnection();
-                PreparedStatement getClientCount = connection.prepareStatement("SELECT free_spots FROM rooms WHERE room_id = ?");
+
+                /**
+                 * Nadanie użytkownikowi ID na podstawie kolejności dołączenia
+                 */
+                PreparedStatement getClientCount = connection.prepareStatement("SELECT ready FROM rooms WHERE room_id = ?");
                 getClientCount.setInt(1,room_number);
                 ResultSet usersCount = getClientCount.executeQuery();
                 usersCount.next();
-                int playerID = 4 - usersCount.getInt("free_spots");
+
+                int playerID = usersCount.getInt("ready");
+
+                /**
+                 * Zwiekszenie ID o 1 dla następnego użytkownika
+                 */
+
+                PreparedStatement updateReady = connection.prepareStatement("UPDATE rooms SET `ready` = `ready` + 1 WHERE room_id = ?");
+                updateReady.setInt(1, room_number);
+                updateReady.executeUpdate();
+
                 ClientGame clientGame = new ClientGame("127.0.0.1", port, clientName, playerID);
 
                 Parent root = null;
                 FXMLLoader loader = new FXMLLoader(RoomsPanelController.class.getResource("GamePanel.fxml"));
                 try {
                     root = loader.load();
+                    
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -321,11 +337,21 @@ public class RoomsPanelController implements Initializable {
             } else {
                 System.out.println("joined game");
                 client.closeConnection();
-                PreparedStatement getClientCount = connection.prepareStatement("SELECT free_spots FROM rooms WHERE room_id = ?");
+
+                /**
+                 * Nadanie userowi ID na podstawie kolejności dołączania
+                 */
+                PreparedStatement getClientCount = connection.prepareStatement("SELECT ready FROM rooms WHERE room_id = ?");
                 getClientCount.setInt(1,room_number);
                 ResultSet usersCount = getClientCount.executeQuery();
                 usersCount.next();
-                int playerID = 4 - usersCount.getInt("free_spots");
+
+                int playerID = usersCount.getInt("ready");
+
+                PreparedStatement updateReady = connection.prepareStatement("UPDATE rooms SET `ready` = `ready` + 1 WHERE room_id = ?");
+                updateReady.setInt(1, room_number);
+                updateReady.executeUpdate();
+
                 ClientGame clientGame = new ClientGame("127.0.0.1", port, clientName, playerID);
 
                 Parent root = null;

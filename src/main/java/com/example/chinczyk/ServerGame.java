@@ -23,7 +23,7 @@ public class ServerGame {
         }
 
         // Czekanie na 4 graczy
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 2; i++) {
             System.out.println("CZEKAM NA KOGOS");
             try {
                 Socket client = serverSocket.accept();
@@ -43,12 +43,13 @@ public class ServerGame {
             resultSet.next();
             String usernames = resultSet.getString("names");
             String[] unames = usernames.split(",");
-            for(int i = 0; i < 4; i++) {
+            for(int i = 0; i < 2; i++) {
                 sockets.put(unames[i],clientList.get(i));
             }
 
             // Utworzenie wątku do obsługi gry
-            new ServerGameThread(sockets);
+            ServerGameThread SGT = new ServerGameThread(sockets);
+            SGT.start();
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -59,18 +60,53 @@ public class ServerGame {
 // Thread do obsługi gry
 class ServerGameThread extends Thread {
     HashMap<String, ClientHandler> sockets;
+    final String tourEnd = "tourEnd";
+    final String diceRoll = "diceRoll";
     public ServerGameThread(HashMap<String, ClientHandler> sockets) {
         this.sockets = sockets;
     }
 
     @Override
     public void run() {
+        ArrayList<String> usernames = new ArrayList<>();
+        for (String key : sockets.keySet())
+        {
+            usernames.add(key);
+        }
         int turnNumber = 0;
         while(true)
         {
-            turnNumber++;
+            try {
+                // Kogo nasluchujemy
+                int whoToListen = turnNumber % 2;
+                System.out.println("who to listen: " + whoToListen);
 
+                // Nasluchiwanie goscia ktory wszedl jako n-ty
+                String message = sockets.get(usernames.get(whoToListen)).in.readLine();
 
+                String[] splitted = message.split(",");
+
+                if(splitted[0].equals(tourEnd))
+                {
+                    if(splitted[1].equals(diceRoll))
+                    {
+                        turnNumber++;
+                        String newMSG = tourEnd + "," + diceRoll + "," + splitted[2] + "," + turnNumber;
+                        for (String key: sockets.keySet())
+                        {
+                            System.out.println(key);
+                            System.out.println(sockets.get(key));
+                            /**
+                             * Wysłanie broadcast o nowej turze
+                             */
+                            sockets.get(key).out.println(newMSG);
+                            sockets.get(key).out.flush();
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }

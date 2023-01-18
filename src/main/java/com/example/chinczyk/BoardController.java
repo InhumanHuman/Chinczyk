@@ -1,5 +1,8 @@
 package com.example.chinczyk;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -41,11 +44,11 @@ public class BoardController implements Initializable {
     private Stage myStage;
     private int userID;
     private int turnNumber = 1;
+    private ObservableList<String> listenerForUpdate = FXCollections.observableArrayList();
 
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
         createPawns();
         System.out.println(red.get(2).getField().toString());
 
@@ -174,43 +177,92 @@ public class BoardController implements Initializable {
 
     @FXML
     private void swapImage() {
+        if(turnNumber == userID)
+        {
+            clientGame.listenerList.addListener(new ListChangeListener<String>() {
+                @Override
+                public void onChanged(Change<? extends String> change) {
+                    updateDice(clientGame.diceRollNumber);
+                }
+            });
+        }
+        String message;
+
+        turnNumber = clientGame.tourNumber;
+        System.out.println(turnNumber);
         // TODO - naprawa ID Board zeby byly dobre ID,
         //  Wysylanie tury, Wysylanie kostki
         //  Zablokowanie kostki po nacisnieciu
-        if(turnNumber % 4 == userID) {
+        if(turnNumber % 2 == userID) {
 
             int random = diceRoll();
-
+            if(random != 6)
+            {
+                System.out.println("Nacisnalem kostke");
+                message = "tourEnd,diceRoll," + random;
+                clientGame.sendToServer(message);
+            }
             Image image;
 
-            switch (random) {
-                case 1:
-                    image = new Image(getClass().getResourceAsStream("dice_1_80x80.png"));
-                    dice_roll.setImage(image);
-                    break;
-                case 2:
-                    image = new Image(getClass().getResourceAsStream("dice_2_80x80.png"));
-                    dice_roll.setImage(image);
-                    break;
-                case 3:
-                    image = new Image(getClass().getResourceAsStream("dice_3_80x80.png"));
-                    dice_roll.setImage(image);
-                    break;
-                case 4:
-                    image = new Image(getClass().getResourceAsStream("dice_4_80x80.png"));
-                    dice_roll.setImage(image);
-                    break;
-                case 5:
-                    image = new Image(getClass().getResourceAsStream("dice_5_80x80.png"));
-                    dice_roll.setImage(image);
-                    break;
-                case 6:
-                    image = new Image(getClass().getResourceAsStream("dice_6_80x80.png"));
-                    dice_roll.setImage(image);
-                    break;
-            }
+//            switch (random) {
+//                case 1:
+//                    image = new Image(getClass().getResourceAsStream("dice_1_80x80.png"));
+//                    dice_roll.setImage(image);
+//                    break;
+//                case 2:
+//                    image = new Image(getClass().getResourceAsStream("dice_2_80x80.png"));
+//                    dice_roll.setImage(image);
+//                    break;
+//                case 3:
+//                    image = new Image(getClass().getResourceAsStream("dice_3_80x80.png"));
+//                    dice_roll.setImage(image);
+//                    break;
+//                case 4:
+//                    image = new Image(getClass().getResourceAsStream("dice_4_80x80.png"));
+//                    dice_roll.setImage(image);
+//                    break;
+//                case 5:
+//                    image = new Image(getClass().getResourceAsStream("dice_5_80x80.png"));
+//                    dice_roll.setImage(image);
+//                    break;
+//                case 6:
+//                    image = new Image(getClass().getResourceAsStream("dice_6_80x80.png"));
+//                    dice_roll.setImage(image);
+//                    break;
+//            }
         }
     }
+
+    private void updateDice(int rollNumber) {
+        Image image;
+        switch(rollNumber) {
+            case 1:
+                image = new Image(getClass().getResourceAsStream("dice_1_80x80.png"));
+                dice_roll.setImage(image);
+                break;
+            case 2:
+                image = new Image(getClass().getResourceAsStream("dice_2_80x80.png"));
+                dice_roll.setImage(image);
+                break;
+            case 3:
+                image = new Image(getClass().getResourceAsStream("dice_3_80x80.png"));
+                dice_roll.setImage(image);
+                break;
+            case 4:
+                image = new Image(getClass().getResourceAsStream("dice_4_80x80.png"));
+                dice_roll.setImage(image);
+                break;
+            case 5:
+                image = new Image(getClass().getResourceAsStream("dice_5_80x80.png"));
+                dice_roll.setImage(image);
+                break;
+            case 6:
+                image = new Image(getClass().getResourceAsStream("dice_6_80x80.png"));
+                dice_roll.setImage(image);
+                break;
+        }
+    }
+
 /*
     private boolean outOfBase(String color)
     {

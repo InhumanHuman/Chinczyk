@@ -1,0 +1,37 @@
+.AnchorPane
+{
+    -fx-background-color : #A882DD;
+//-fx-background-color : #DBC2CF
+}
+
+/* button styling */
+
+.button
+{
+    -fx-background-color : #5702C7;
+    -fx-text-fill : #FFFFFF;
+}
+.button:hover
+{
+    -fx-background-color : #C954E0;
+    -fx-text-fill : #FFFFFF;
+}
+.button:pressed
+{
+    -fx-background-color : #C954E0;
+    -fx-text-fill : #FFFFFF;
+}
+
+/* VBox styling */
+
+.VBox
+{
+    -fx-background-color : #A882DD;
+}
+
+/* Text styling */
+
+.Text
+{
+    -fx-text-fill : #FFFFFF;
+}

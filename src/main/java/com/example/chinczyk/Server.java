@@ -16,18 +16,15 @@ public class Server {
         try {
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ludo_db", "root", "root");
 
-            List<Socket> clients;
             Socket client;
             ServerSocket server;
             server = new ServerSocket(1200);
             System.out.println("New server initialized!");
 
-            clients = Collections.synchronizedList(new ArrayList<>());
 
             while(true)
             {
                 client = server.accept();
-                clients.add(client);
                 System.out.println("Ustanowiono polaczenie");
                 ServerThread st = new ServerThread(client);
                 st.start();
@@ -38,8 +35,7 @@ public class Server {
     }
 }
 
-class ServerThread extends Thread
-{
+class ServerThread extends Thread {
     private Socket client;
     private BufferedReader in;
     private PrintWriter out;
@@ -47,8 +43,7 @@ class ServerThread extends Thread
     final String joined_room = "Joined_Room";
     final String start_game = "StartGame";
 
-    ServerThread(Socket client)
-    {
+    ServerThread(Socket client) {
         this.client = client;
     }
 
@@ -65,8 +60,7 @@ class ServerThread extends Thread
         }
         while (true) {
             try {
-                for(List<String> item : PlayersInRooms.playersInRooms)
-                {
+                for (List<String> item : PlayersInRooms.playersInRooms) {
                     System.out.println(item);
                 }
                 line = in.readLine();
@@ -78,33 +72,10 @@ class ServerThread extends Thread
                 String msg_p2 = splited[1];
                 String msg_p3 = splited[2];
 
-                if(msg_p1.equals(joined_room))
-                {
-                    int room = Integer.parseInt(msg_p2);
-                    PlayersInRooms.playersInRooms.get(room).add(msg_p3);
-
-                    RoomsPanelController roomsPanelController = new RoomsPanelController();
-
-                    roomsPanelController.updateRooms();
-                }
-                else if(msg_p1.equals(start_game))
-                {
-                    ArrayList<ArrayList<Client>> clients = (ArrayList<ArrayList<Client>>) in_o.readObject();
-
-                    System.out.println(clients.get(0).get(0).getUsername());
-                }
-
-
             } catch (IOException e) {
                 e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
             }
         }
     }
-}
-class ServerGameThread extends Thread
-{
-
 }
 

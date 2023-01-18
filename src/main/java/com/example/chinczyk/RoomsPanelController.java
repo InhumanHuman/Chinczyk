@@ -1,22 +1,20 @@
 package com.example.chinczyk;
 
-import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import java.net.Socket;
+import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
 import java.util.*;
@@ -24,7 +22,7 @@ import java.util.*;
 public class RoomsPanelController implements Initializable {
 
     private String clientName;
-
+    private Client client;
 
     @FXML
     Button joinButton0, joinButton1, joinButton2, joinButton3, joinButton4;
@@ -32,6 +30,11 @@ public class RoomsPanelController implements Initializable {
     Button joinButton5, joinButton6, joinButton7, joinButton8, joinButton9;
     @FXML
     Button refreshButton;
+
+    @FXML
+    Button readyButton0, readyButton1, readyButton2, readyButton3, readyButton4;
+    @FXML
+    Button readyButton5, readyButton6, readyButton7, readyButton8, readyButton9;
     @FXML
     ListView playersListView0, playersListView1, playersListView2, playersListView3, playersListView4;
     @FXML
@@ -43,7 +46,6 @@ public class RoomsPanelController implements Initializable {
     public void updateRooms() {
         playersListView0.setItems(PlayersInRooms.playersInRooms.get(0));
     }
-
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle)
@@ -76,6 +78,33 @@ public class RoomsPanelController implements Initializable {
                 return playersListView8;
             case 9:
                 return playersListView9;
+            default:
+                return null;
+        }
+    }
+
+    public Button returnCorrectButton(int room_nr) {
+        switch(room_nr) {
+            case 0:
+                return readyButton0;
+            case 1:
+                return readyButton1;
+            case 2:
+                return readyButton2;
+            case 3:
+                return readyButton3;
+            case 4:
+                return readyButton4;
+            case 5:
+                return readyButton5;
+            case 6:
+                return readyButton6;
+            case 7:
+                return readyButton7;
+            case 8:
+                return readyButton8;
+            case 9:
+                return readyButton9;
             default:
                 return null;
         }
@@ -151,7 +180,7 @@ public class RoomsPanelController implements Initializable {
 
             ResultSet resultSet = getUserOccurence.executeQuery();
             while(resultSet.next()) {
-                System.out.println(resultSet.getInt("room_id"));
+                //System.out.println(resultSet.getInt("room_id"));
                 int roomNr = resultSet.getInt("room_id");
                 PreparedStatement psUpdateFreeSpots = connection.prepareStatement("UPDATE rooms SET free_spots = free_spots + 1 WHERE room_id = ?");
                 psUpdateFreeSpots.setInt(1,roomNr);
@@ -181,18 +210,13 @@ public class RoomsPanelController implements Initializable {
 
         int room_number = Integer.parseInt(ID.replaceAll("([A-Za-z])", ""));
 
-
-
         //ObservableList<String> listOfPlayers = FXCollections.observableArrayList();
 
         Node node = (Node) event.getSource();
         Stage stage = (Stage) node.getScene().getWindow();
-        Client client = (Client) stage.getUserData();
+        client = (Client) stage.getUserData();
 
-        String message = "Joined_Room," + room_number + "," + client.getUsername();
-        client.sendToServer(message);
-        String username = client.getUsername();
-
+        clientName = client.getUsername();
 
         try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ludo_db", "root", "root")) {
             PreparedStatement psCheck = connection.prepareStatement("SELECT free_spots FROM rooms WHERE room_id = ?");
@@ -201,48 +225,112 @@ public class RoomsPanelController implements Initializable {
             resultSet.next();
             // TODO - do optymalizacji
             int spots = resultSet.getInt("free_spots");
-            if(spots > 1) {
-                listOfClients.get(room_number).add(client);
-                errorMessage.setText("");
-                leaveRoom(username,room_number);
+            ObservableList<String> usersInRoomList = returnCorrectList(room_number).getItems();
+            if (!usersInRoomList.contains(clientName)) {
+                if (spots > 1) {
+                    listOfClients.get(room_number).add(client);
+                    errorMessage.setText("");
+                    leaveRoom(clientName, room_number);
+                    Button roomReadyButton = returnCorrectButton(room_number);
+                    roomReadyButton.setVisible(true);
+                    PreparedStatement psInsert = connection.prepareStatement("INSERT INTO users(name, room_id) VALUES(?,?)");
+                    psInsert.setString(1, client.getUsername());
+                    psInsert.setInt(2, room_number);
+                    psInsert.executeUpdate();
 
-                PreparedStatement psInsert = connection.prepareStatement("INSERT INTO users(name, room_id) VALUES(?,?)");
-                psInsert.setString(1, client.getUsername());
-                psInsert.setInt(2, room_number);
-                psInsert.executeUpdate();
+                    PreparedStatement psUpdate = connection.prepareStatement("UPDATE rooms SET free_spots = free_spots - 1 WHERE room_id = ?");
+                    psUpdate.setInt(1, room_number);
+                    psUpdate.executeUpdate();
+                    refreshRooms(event);
 
-                PreparedStatement psUpdate = connection.prepareStatement("UPDATE rooms SET free_spots = free_spots - 1 WHERE room_id = ?");
-                psUpdate.setInt(1, room_number);
-                psUpdate.executeUpdate();
-                refreshRooms(event);
+                    String message_startgame = "StartGame," + room_number + ", null";
+                    client.sendToServer(message_startgame);
+
+
+                    //client.sendToServerObject(listOfClients.get(room_number));
+                } else if (spots == 1) {
+                    listOfClients.get(room_number).add(client);
+                    Button roomReadyButton = returnCorrectButton(room_number);
+                    roomReadyButton.setVisible(true);
+                    PreparedStatement psInsert = connection.prepareStatement("INSERT INTO users(name, room_id) VALUES(?,?)");
+                    psInsert.setString(1, client.getUsername());
+                    psInsert.setInt(2, room_number);
+                    psInsert.executeUpdate();
+
+                    PreparedStatement psUpdate = connection.prepareStatement("UPDATE rooms SET free_spots = free_spots - 1 WHERE room_id = ?");
+                    psUpdate.setInt(1, room_number);
+                    psUpdate.executeUpdate();
+                    refreshRooms(event);
+                } else {
+                    errorMessage.setText("Pokój pełny!");
+                }
             }
-            else if(spots == 1){
-                listOfClients.get(room_number).add(client);
-                PreparedStatement psInsert = connection.prepareStatement("INSERT INTO users(name, room_id) VALUES(?,?)");
-                psInsert.setString(1, client.getUsername());
-                psInsert.setInt(2, room_number);
-                psInsert.executeUpdate();
-
-                PreparedStatement psUpdate = connection.prepareStatement("UPDATE rooms SET free_spots = free_spots - 1 WHERE room_id = ?");
-                psUpdate.setInt(1, room_number);
-                psUpdate.executeUpdate();
-
-                String message_startgame = "StartGame," + room_number + ", null";
-                client.sendToServer(message_startgame);
-                client.sendToServerObject(listOfClients);
-
-
-
-                //funkcja do zaczęcia gry
+            } catch(SQLException e){
+                throw new RuntimeException(e);
             }
-            else {
-                errorMessage.setText("Pokój pełny!");
-            }
+    }
 
+    public void readyForGame(ActionEvent event) {
+        Button button = (Button) event.getSource();
+        button.setDisable(true);
+        String ID = button.getId();
+
+
+        int room_number = Integer.parseInt(ID.replaceAll("([A-Za-z])", ""));
+        int port = 1400 + room_number;
+
+
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ludo_db", "root", "root")) {
+            PreparedStatement checkGameServers = connection.prepareStatement("SELECT `empty` FROM game_servers WHERE port = ?");
+            checkGameServers.setInt(1, 1400 + room_number);
+            ResultSet resultSet = checkGameServers.executeQuery();
+            resultSet.next();
+            int serverStatus = resultSet.getInt("empty");
+            if (serverStatus == 1) {
+                Thread t = new Thread(() -> {
+                    ServerGame serverGame = new ServerGame(port);
+                });
+                t.start();
+                System.out.println("new server for game");
+                PreparedStatement updateServerStatus = connection.prepareStatement("UPDATE game_servers SET `empty` = 0 WHERE port = ?");
+                updateServerStatus.setInt(1, 1400 + room_number);
+                updateServerStatus.executeUpdate();
+                client.closeConnection();
+                ClientGame clientGame = new ClientGame("127.0.0.1", port, clientName);
+
+                Parent root = null;
+                FXMLLoader loader = new FXMLLoader(RoomsPanelController.class.getResource("GamePanel.fxml"));
+                try {
+                    root = loader.load();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                BoardController GamePanelController = loader.getController();
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                stage.setTitle("Gra");
+                stage.setScene(new Scene(root, 600,600));
+                stage.show();
+            } else {
+                System.out.println("joined game");
+                client.closeConnection();
+                ClientGame clientGame = new ClientGame("127.0.0.1", port, clientName);
+
+                Parent root = null;
+                FXMLLoader loader = new FXMLLoader(RoomsPanelController.class.getResource("GamePanel.fxml"));
+                try {
+                    root = loader.load();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                BoardController GamePanelController = loader.getController();
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                stage.setTitle("Gra");
+                stage.setScene(new Scene(root, 600,600));
+                stage.show();
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
-
 
 }

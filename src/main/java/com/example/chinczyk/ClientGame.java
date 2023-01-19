@@ -16,7 +16,8 @@ public class ClientGame
     protected int ID;
     protected int tourNumber;
     protected int diceRollNumber;
-    protected ObservableList<String> listenerList = FXCollections.observableArrayList();
+    protected ObservableList<String> DiceValueList = FXCollections.observableArrayList();
+    protected String color;
 
 
     public int getID()
@@ -35,6 +36,7 @@ public class ClientGame
             this.out = new PrintWriter(client.getOutputStream());
             this.username = username;
             this.ID = ID;
+            this.color = pickColor(ID);
 
             ClientGameThread CGT = new ClientGameThread(client, username, this);
             CGT.start();
@@ -51,6 +53,19 @@ public class ClientGame
         System.out.println("Wysylam wiadomosc");
         out.println(message);
         out.flush();
+    }
+    public String pickColor(int ID) {
+        switch(ID) {
+            case 0:
+                return "red";
+            case 1:
+                return "green";
+            case 2:
+                return "blue";
+            case 3:
+                return "yellow";
+        }
+        return null;
     }
 
 }
@@ -92,11 +107,13 @@ class ClientGameThread extends Thread
                     if(splited[1].equals(diceRoll))
                     {
                         int diceRollNumber = Integer.parseInt(splited[2]);
+                        System.out.println("WYLOSOWANA LICZBA: " + diceRollNumber);
                         int tourNumber = Integer.parseInt(splited[3]);
                         System.out.println("Aktualizuje liste");
-                        clientGame.listenerList.add("diceRoll," + diceRollNumber);
+
                         clientGame.diceRollNumber = diceRollNumber;
                         clientGame.tourNumber = tourNumber;
+                        clientGame.DiceValueList.add("diceRoll," + diceRollNumber);
                     }
 
                 }

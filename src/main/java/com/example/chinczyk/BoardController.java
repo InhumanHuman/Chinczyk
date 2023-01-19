@@ -8,15 +8,12 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
-import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Random;
@@ -29,9 +26,16 @@ public class BoardController implements Initializable {
     private ImageView dice_roll;
     @FXML
     private ImageView red_1, red_2, red_3, red_4;
+    @FXML
     private ImageView green_1, green_2, green_3, green_4;
+    @FXML
     private ImageView blue_1, blue_2, blue_3, blue_4;
+    @FXML
     private ImageView yellow_1, yellow_2, yellow_3, yellow_4;
+    
+    private Double clickedX;
+    private Double clickedY;
+    private Node clickedNode;
 
     private ArrayList<Field> fields = new ArrayList<Field>();
     private ArrayList<Pawn> red = new ArrayList<Pawn>();
@@ -50,21 +54,17 @@ public class BoardController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         createPawns();
-        System.out.println(red.get(2).getField().toString());
+        createFields();
+        GameGrid.addEventHandler(MouseEvent.MOUSE_CLICKED, e-> {
+            clickedX = e.getX();
+            clickedY = e.getY();
+            clickedNode = getNodeFromGridPane(GameGrid,(int) Math.round(clickedX/50) ,(int) Math.round(clickedY/50));
+            String color = clickedNode.getId().substring(0,clickedNode.getId().length()-2);
 
-        EventHandler<MouseEvent> mouseEventHandler = mouseEvent ->
-        {
-        };
-        red_1.setOnMouseClicked(mouseEventHandler);
-
-
-
-        red_1.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-            if(random == 6)
-            {
-
+            if(clickedNode.getId() != null && color.equals(clientGame.color) ) {
+                System.out.println("Ruszam do boju");
+                moveClickedPawn();
             }
-            event.consume();
         });
     }
 
@@ -76,6 +76,15 @@ public class BoardController implements Initializable {
 
         userID = clientGame.getID();
         System.out.println("Board : " + userID);
+
+        clientGame.DiceValueList.addListener(new ListChangeListener<String>() {
+            @Override
+            public void onChanged(Change<? extends String> change) {
+                System.out.println("LISTENER");
+                System.out.println("LICZBA: " + clientGame.diceRollNumber);
+                updateDice(clientGame.diceRollNumber);
+            }
+        });
     }
 
 
@@ -83,9 +92,24 @@ public class BoardController implements Initializable {
     @FXML
     protected void onHelloButtonClick() {
         Node czerwony = getNodeFromGridPane(GameGrid, 1, 1);
+        ImageView cos = (ImageView) czerwony;
+
+        Node pole = getNodeFromGridPane(GameGrid, 1, 5);
+        ImageView pole_image = (ImageView) pole;
+
+        pole_image.setImage(cos.getImage());
+
         czerwony.setVisible(false);
         System.out.println(czerwony.getId());
-
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        pole = getNodeFromGridPane(GameGrid, fields.get(5).getX(),fields.get(5).getY());
+        ImageView pole2 = (ImageView) pole;
+        pole2.setImage(pole_image.getImage());
+        pole_image.setVisible(false);
     }
 
 
@@ -156,13 +180,14 @@ public class BoardController implements Initializable {
     }
 
     private ArrayList<Pawn> createColorPawns(String color, int x, int y)
+
     {
         ArrayList<Pawn> temp_list = new ArrayList<>();
 
-        temp_list.add(new Pawn(color, color + "_" + 1, new Field(x,y)));
-        temp_list.add(new Pawn(color, color + "_" + 2, new Field(x + 1,y)));
-        temp_list.add(new Pawn(color, color + "_" + 3, new Field(x,y + 1)));
-        temp_list.add(new Pawn(color, color + "_" + 4, new Field(x + 1,y + 1)));
+        temp_list.add(new Pawn(color, color + "_" + 1, new Field(   x  ,      y)));
+        temp_list.add(new Pawn(color, color + "_" + 2, new Field( x + 1,    y)));
+        temp_list.add(new Pawn(color, color + "_" + 3, new Field(   x,      y + 1)));
+        temp_list.add(new Pawn(color, color + "_" + 4, new Field( x + 1,  y + 1)));
 
         return temp_list;
     }
@@ -174,62 +199,68 @@ public class BoardController implements Initializable {
 
         return random;
     }
+    private boolean isPawnInBase(Field field, String color) {
+        ArrayList<Pawn> pawnsInBase = new ArrayList<>();
+
+        ArrayList<Field> redStartFields = new ArrayList<>();
+        redStartFields.add(new Field(1, 1));
+        redStartFields.add(new Field(2, 1));
+        redStartFields.add(new Field(1, 2));
+        redStartFields.add(new Field(2, 2));
+
+        ArrayList<Field> greenStartFields = new ArrayList<>();
+        greenStartFields.add(new Field(10, 1));
+        greenStartFields.add(new Field(11, 1));
+        greenStartFields.add(new Field(10, 2));
+        greenStartFields.add(new Field(11, 2));
+
+        ArrayList<Field> blueStartFields = new ArrayList<>();
+        blueStartFields.add(new Field(10, 10));
+        blueStartFields.add(new Field(11, 10));
+        blueStartFields.add(new Field(10, 11));
+        blueStartFields.add(new Field(11, 11));
+
+        ArrayList<Field> yellowStartFields = new ArrayList<>();
+        yellowStartFields.add(new Field(1, 10));
+        yellowStartFields.add(new Field(2, 10));
+        yellowStartFields.add(new Field(1, 11));
+        yellowStartFields.add(new Field(2, 11));
+
+        switch (color) {
+            case "red":
+                for (Field field1 : redStartFields) {
+                    if (field1.getX() == field.getX() && field1.getY() == field.getY()) return true;
+                }
+             case "green":
+                for (Field field1 : greenStartFields) {
+                    if (field1.getX() == field.getX() && field1.getY() == field.getY()) return true;
+                }
+            case "blue":
+                for (Field field1 : blueStartFields) {
+                    if (field1.getX() == field.getX() && field1.getY() == field.getY()) return true;
+                }
+            case "yellow":
+                for (Field field1 : yellowStartFields) {
+                    if (field1.getX() == field.getX() && field1.getY() == field.getY()) return true;
+                }
+    }
+        return false;
+    }
 
     @FXML
     private void swapImage() {
-        if(turnNumber == userID)
-        {
-            clientGame.listenerList.addListener(new ListChangeListener<String>() {
-                @Override
-                public void onChanged(Change<? extends String> change) {
-                    updateDice(clientGame.diceRollNumber);
-                }
-            });
-        }
         String message;
 
         turnNumber = clientGame.tourNumber;
-        System.out.println(turnNumber);
-        // TODO - naprawa ID Board zeby byly dobre ID,
-        //  Wysylanie tury, Wysylanie kostki
-        //  Zablokowanie kostki po nacisnieciu
         if(turnNumber % 2 == userID) {
 
-            int random = diceRoll();
+            random = diceRoll();
             if(random != 6)
             {
-                System.out.println("Nacisnalem kostke");
                 message = "tourEnd,diceRoll," + random;
                 clientGame.sendToServer(message);
             }
-            Image image;
 
-//            switch (random) {
-//                case 1:
-//                    image = new Image(getClass().getResourceAsStream("dice_1_80x80.png"));
-//                    dice_roll.setImage(image);
-//                    break;
-//                case 2:
-//                    image = new Image(getClass().getResourceAsStream("dice_2_80x80.png"));
-//                    dice_roll.setImage(image);
-//                    break;
-//                case 3:
-//                    image = new Image(getClass().getResourceAsStream("dice_3_80x80.png"));
-//                    dice_roll.setImage(image);
-//                    break;
-//                case 4:
-//                    image = new Image(getClass().getResourceAsStream("dice_4_80x80.png"));
-//                    dice_roll.setImage(image);
-//                    break;
-//                case 5:
-//                    image = new Image(getClass().getResourceAsStream("dice_5_80x80.png"));
-//                    dice_roll.setImage(image);
-//                    break;
-//                case 6:
-//                    image = new Image(getClass().getResourceAsStream("dice_6_80x80.png"));
-//                    dice_roll.setImage(image);
-//                    break;
-//            }
         }
     }
 
@@ -260,28 +291,141 @@ public class BoardController implements Initializable {
                 image = new Image(getClass().getResourceAsStream("dice_6_80x80.png"));
                 dice_roll.setImage(image);
                 break;
+            case 7:
+                image = new Image(getClass().getResourceAsStream("dice_default_80x80.png"));
+                dice_roll.setImage(image);
+                break;
         }
     }
 
-/*
-    private boolean outOfBase(String color)
-    {
-        if(random == 6 && checkBase("red_1"))
-        {
-            return true;
+    private ArrayList<Pawn> getMyPawnList(String color) {
+        switch(color) {
+            case "red":
+                return red;
+            case "green":
+                return green;
+            case "blue":
+                return blue;
+            case "yellow":
+                return yellow;
         }
-
+        return null;
+    }
+    private Field getStartingField(String color) {
+        Field startingField = new Field(0,0);
+        switch(color) {
+            case "red":
+                startingField.setX(fields.get(startingField.RED_START_POINT).getX());
+                startingField.setY(fields.get(startingField.RED_START_POINT).getY());
+                return startingField;
+            case "green":
+                startingField.setX(fields.get(startingField.GREEN_START_POINT).getX());
+                startingField.setY(fields.get(startingField.GREEN_START_POINT).getY());
+                return startingField;
+            case "blue":
+                startingField.setX(fields.get(startingField.BLUE_START_POINT).getX());
+                startingField.setY(fields.get(startingField.BLUE_START_POINT).getY());
+                return startingField;
+            case "yellow":
+                startingField.setX(fields.get(startingField.YELLOW_START_POINT).getX());
+                startingField.setY(fields.get(startingField.YELLOW_START_POINT).getY());
+                return startingField;
+        }
+        return null;
     }
 
-    private boolean checkBase(String color)
-    {
-
-    }
-*/
     @FXML
-    private void movePawn()
-    {
+    private void movePawn() {
+
     }
 
+    private void movePawnOutOfBase() {
+        Image pawnToMove = getPawnToMove(clickedNode.getId()).getImage();
+        if(clientGame.color.equals("red")) {
+            Node startField = getNodeFromGridPane(GameGrid, 1, 5);
+            ImageView startingField = (ImageView) startField;
+            startingField.setImage(pawnToMove);
+            ImageView clickedPawn = (ImageView) clickedNode;
+            clickedPawn.setImage(null);
+        }
+        if(clientGame.color.equals("green")) {
+            Node startField = getNodeFromGridPane(GameGrid, 7, 1);
+            ImageView startingField = (ImageView) startField;
+            startingField.setImage(pawnToMove);
+            ImageView clickedPawn = (ImageView) clickedNode;
+            clickedPawn.setImage(null);
+        }
+        if(clientGame.color.equals("blue")) {
+            Node startField = getNodeFromGridPane(GameGrid, 11, 7);
+            ImageView startingField = (ImageView) startField;
+            startingField.setImage(pawnToMove);
+            ImageView clickedPawn = (ImageView) clickedNode;
+            clickedPawn.setImage(null);
+        }
+        if(clientGame.color.equals("yellow")) {
+            Node startField = getNodeFromGridPane(GameGrid, 5, 11);
+            ImageView startingField = (ImageView) startField;
+            startingField.setImage(pawnToMove);
+            ImageView clickedPawn = (ImageView) clickedNode;
+            clickedPawn.setImage(null);
+        }
+
+    }
+
+    private void moveClickedPawn()
+    {
+        ArrayList<Pawn> userPawns = getMyPawnList(clientGame.color);
+        Pawn pawnToMove = null;
+        for(Pawn pawn: userPawns) {
+            if(pawn.getName().equals(clickedNode.getId())) pawnToMove = pawn;
+        }
+        // TODO - dodac z powrotem argument do sprawdzenia clientGame.diceRollNumber
+
+        if(isPawnInBase(pawnToMove.getField(), clientGame.color))
+        {
+           // pawnToMove.setField(getStartingField(clientGame.color));
+            System.out.println("Wychodze z bazy");
+            movePawnOutOfBase();
+        }
+    }
+
+    private ImageView getPawnToMove(String id) {
+        System.out.println(id);
+        switch (id) {
+            case "red_1":
+                return red_1;
+            case "red_2":
+                return red_2;
+            case "red_3":
+                return red_3;
+            case "red_4":
+                return red_4;
+            case "green_1":
+                return green_1;
+            case "green_2":
+                return green_2;
+            case "green_3":
+                return green_3;
+            case "green_4":
+                return green_4;
+            case "blue_1":
+                return blue_1;
+            case "blue_2":
+                return blue_2;
+            case "blue_3":
+                return blue_3;
+            case "blue_4":
+                return blue_4;
+            case "yellow_1":
+                return yellow_1;
+            case "yellow_2":
+                return yellow_2;
+            case "yellow_3":
+                return yellow_3;
+            case "yellow_4":
+                return yellow_4;
+        }
+        return null;
+    }
 
 }

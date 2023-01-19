@@ -1,9 +1,6 @@
 package com.example.chinczyk;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.*;
@@ -100,7 +97,9 @@ class ServerGameThread extends Thread {
                              * Wysłanie broadcast o nowej turze
                              */
                             sockets.get(key).out.println(newMSG);
+                            //sockets.get(key).out.println(newMSG);
                             sockets.get(key).out.flush();
+
                         }
                     }
                 }

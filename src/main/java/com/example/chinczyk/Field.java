@@ -11,7 +11,7 @@ public class Field {
         this.y = y;
     }
 
-    public int getXY() {
+    public int getX() {
         return x;
     }
 
@@ -26,6 +26,7 @@ public class Field {
     public void setY(int y) {
         this.y = y;
     }
+
 
     @Override
     public String toString() {

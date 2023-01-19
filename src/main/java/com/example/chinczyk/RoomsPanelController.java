@@ -1,5 +1,6 @@
 package com.example.chinczyk;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -324,7 +325,6 @@ public class RoomsPanelController implements Initializable {
                 FXMLLoader loader = new FXMLLoader(RoomsPanelController.class.getResource("GamePanel.fxml"));
                 try {
                     root = loader.load();
-                    
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

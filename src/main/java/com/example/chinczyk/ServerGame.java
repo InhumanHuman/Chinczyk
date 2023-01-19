@@ -59,6 +59,7 @@ class ServerGameThread extends Thread {
     HashMap<String, ClientHandler> sockets;
     final String tourEnd = "tourEnd";
     final String diceRoll = "diceRoll";
+    final String pawnMoved = "pawnMoved";
     public ServerGameThread(HashMap<String, ClientHandler> sockets) {
         this.sockets = sockets;
     }
@@ -83,29 +84,48 @@ class ServerGameThread extends Thread {
 
                 String[] splitted = message.split(",");
 
-                if(splitted[0].equals(tourEnd))
-                {
-                    if(splitted[1].equals(diceRoll))
-                    {
-                        turnNumber++;
-                        String newMSG = tourEnd + "," + diceRoll + "," + splitted[2] + "," + turnNumber;
-                        for (String key: sockets.keySet())
-                        {
-                            System.out.println(key);
-                            System.out.println(sockets.get(key));
-                            /**
-                             * Wysłanie broadcast o nowej turze
-                             */
-                            sockets.get(key).out.println(newMSG);
-                            //sockets.get(key).out.println(newMSG);
-                            sockets.get(key).out.flush();
+                String newMSG = null;
 
-                        }
-                    }
+
+                //PRZYKŁAD : diceRoll,4
+                if(splitted[0].equals(diceRoll))
+                {
+                    newMSG = diceRoll + "," + splitted[1];
+
+                    //Wysłanie broadcast do wszystkich o nowej wartości kości
+                    sendBroadcast(newMSG);
+
+                }
+                //PRZYKŁAD: pawnMoved,red_3,15
+                if(splitted[0].equals(pawnMoved))
+                {
+                    sendBroadcast(message);
+                    System.out.println("PAWNMOVED: \nKtory pionek: " + splitted[1] + "\nKtore pole: " + splitted[2]);
+                }
+                //PRZYKŁAD: tourEnd
+                if (splitted[0].equals(tourEnd))
+                {
+                    turnNumber++;
+
+                    newMSG = tourEnd + "," + turnNumber;
+                    sendBroadcast(newMSG);
+
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+        }
+    }
+
+    private void sendBroadcast(String newMSG)
+    {
+        for (String key: sockets.keySet())
+        {
+            System.out.println(key);
+            System.out.println(sockets.get(key));
+
+            sockets.get(key).out.println(newMSG);
+            sockets.get(key).out.flush();
         }
     }
 }

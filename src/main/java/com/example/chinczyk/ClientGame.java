@@ -17,6 +17,7 @@ public class ClientGame
     protected int tourNumber;
     protected int diceRollNumber;
     protected ObservableList<String> DiceValueList = FXCollections.observableArrayList();
+    protected ObservableList<String> PawnsValueList = FXCollections.observableArrayList();
     protected String color;
 
 
@@ -95,6 +96,7 @@ class ClientGameThread extends Thread
     public void run() {
         final String tourEnd = "tourEnd";
         final String diceRoll = "diceRoll";
+        final String pawnMoved = "pawnMoved";
         while(true)
         {
             try {
@@ -102,20 +104,25 @@ class ClientGameThread extends Thread
                 String gotInfo = in.readLine();
                 System.out.println("gotInfo: " + gotInfo);
                 String[] splited = gotInfo.split(",");
+
+                if(splited[0].equals(diceRoll))
+                {
+                    int diceRollNumber = Integer.parseInt(splited[1]);
+
+                    System.out.println("WYLOSOWANA LICZBA: " + diceRollNumber);
+                    System.out.println("Aktualizuje kostke");
+
+                    clientGame.diceRollNumber = diceRollNumber;
+                    clientGame.DiceValueList.add("diceRoll," + diceRollNumber);
+                }
                 if(splited[0].equals(tourEnd))
                 {
-                    if(splited[1].equals(diceRoll))
-                    {
-                        int diceRollNumber = Integer.parseInt(splited[2]);
-                        System.out.println("WYLOSOWANA LICZBA: " + diceRollNumber);
-                        int tourNumber = Integer.parseInt(splited[3]);
-                        System.out.println("Aktualizuje liste");
-
-                        clientGame.diceRollNumber = diceRollNumber;
-                        clientGame.tourNumber = tourNumber;
-                        clientGame.DiceValueList.add("diceRoll," + diceRollNumber);
-                    }
-
+                    int tourNumber = Integer.parseInt(splited[1]);
+                    clientGame.tourNumber = tourNumber;
+                }
+                if(splited[0].equals(pawnMoved))
+                {
+                    System.out.println("KLIENT\nPIONEK: " + splited[1] + "\nNEW FIELD: " + splited[2]);
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);

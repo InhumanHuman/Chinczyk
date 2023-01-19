@@ -185,7 +185,6 @@
             <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="6" GridPane.rowIndex="8" />
             <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="6" GridPane.rowIndex="9" />
             <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="6" GridPane.rowIndex="10" />
-            <Button fx:id="test" mnemonicParsing="false" onAction="#onHelloButtonClick" text="Button" GridPane.columnIndex="2" GridPane.rowIndex="8" />
             <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
             <Button fx:id="startGame" mnemonicParsing="false" onAction="#getClient" text="Start" GridPane.columnIndex="3" GridPane.rowIndex="8" />
          </children>

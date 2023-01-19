@@ -18,6 +18,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.ResourceBundle;
+import java.util.SortedMap;
 
 public class BoardController implements Initializable {
     @FXML
@@ -32,7 +33,12 @@ public class BoardController implements Initializable {
     private ImageView blue_1, blue_2, blue_3, blue_4;
     @FXML
     private ImageView yellow_1, yellow_2, yellow_3, yellow_4;
-    
+
+    private Image redImage = new Image(getClass().getResourceAsStream("player_model_red_49x49.png"));
+    private Image greenImage = new Image(getClass().getResourceAsStream("player_model_green_49x49.png"));
+    private Image blueImage = new Image(getClass().getResourceAsStream("player_model_blue_49x49.png"));
+    private Image yellowImage = new Image(getClass().getResourceAsStream("player_model_yellow_49x49.png"));
+
     private Double clickedX;
     private Double clickedY;
     private Node clickedNode;
@@ -48,13 +54,19 @@ public class BoardController implements Initializable {
     private Stage myStage;
     private int userID;
     private int turnNumber = 1;
+    private boolean isRolled = false;
     private ObservableList<String> listenerForUpdate = FXCollections.observableArrayList();
-
+    private ArrayList<Field> redBase = new ArrayList<>();
+    private ArrayList<Field> greenBase = new ArrayList<>();
+    private ArrayList<Field> blueBase = new ArrayList<>();
+    private ArrayList<Field> yellowBase = new ArrayList<>();
+    private int[] baseStats = {0,0,0,0};
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         createPawns();
         createFields();
+        initializeBases();
         GameGrid.addEventHandler(MouseEvent.MOUSE_CLICKED, e-> {
             clickedX = e.getX();
             clickedY = e.getY();
@@ -66,6 +78,24 @@ public class BoardController implements Initializable {
                 moveClickedPawn();
             }
         });
+    }
+    private void initializeBases() {
+        redBase.add(new Field(5,6));
+        redBase.add(new Field(4,6));
+        redBase.add(new Field(3,6));
+        redBase.add(new Field(2,6));
+        greenBase.add(new Field(6,5));
+        greenBase.add(new Field(6,4));
+        greenBase.add(new Field(6,3));
+        greenBase.add(new Field(6,2));
+        blueBase.add(new Field(7,6));
+        blueBase.add(new Field(8,6));
+        blueBase.add(new Field(9,6));
+        blueBase.add(new Field(10,6));
+        yellowBase.add(new Field(6,7));
+        yellowBase.add(new Field(6,8));
+        yellowBase.add(new Field(6,9));
+        yellowBase.add(new Field(6,10));
     }
 
     @FXML
@@ -80,36 +110,17 @@ public class BoardController implements Initializable {
         clientGame.DiceValueList.addListener(new ListChangeListener<String>() {
             @Override
             public void onChanged(Change<? extends String> change) {
-                System.out.println("LISTENER");
                 System.out.println("LICZBA: " + clientGame.diceRollNumber);
                 updateDice(clientGame.diceRollNumber);
             }
         });
-    }
-
-
-
-    @FXML
-    protected void onHelloButtonClick() {
-        Node czerwony = getNodeFromGridPane(GameGrid, 1, 1);
-        ImageView cos = (ImageView) czerwony;
-
-        Node pole = getNodeFromGridPane(GameGrid, 1, 5);
-        ImageView pole_image = (ImageView) pole;
-
-        pole_image.setImage(cos.getImage());
-
-        czerwony.setVisible(false);
-        System.out.println(czerwony.getId());
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        pole = getNodeFromGridPane(GameGrid, fields.get(5).getX(),fields.get(5).getY());
-        ImageView pole2 = (ImageView) pole;
-        pole2.setImage(pole_image.getImage());
-        pole_image.setVisible(false);
+        clientGame.PawnsValueList.addListener(new ListChangeListener<String>() {
+            @Override
+            public void onChanged(Change<? extends String> change) {
+                System.out.println("LISTENER");
+                updatePawns();
+            }
+        });
     }
 
 
@@ -195,7 +206,7 @@ public class BoardController implements Initializable {
     private int diceRoll()
     {
         Random r = new Random();
-        random = r.nextInt(1,6);
+        random = r.nextInt(1,7);
 
         return random;
     }
@@ -247,17 +258,39 @@ public class BoardController implements Initializable {
         return false;
     }
 
+    private void updatePawns()
+    {
+
+    }
+
     @FXML
     private void swapImage() {
         String message;
 
         turnNumber = clientGame.tourNumber;
         if(turnNumber % 2 == userID) {
+            isRolled = true;
 
             random = diceRoll();
             if(random != 6)
             {
-                message = "tourEnd,diceRoll," + random;
+                //if wszystkie pionki w bazie
+
+                //Wysłanie stanu kostki
+                message = "diceRoll," + random;
+                clientGame.sendToServer(message);
+
+                //Wysłanie informacji o końcu tury
+                message = "tourEnd";
+                clientGame.sendToServer(message);
+
+
+
+                //if jakis pionek (przynajmniej jedne) poza baza
+            }
+            if(random == 6)
+            {
+                message = "diceRoll," + random;
                 clientGame.sendToServer(message);
             }
 
@@ -311,65 +344,274 @@ public class BoardController implements Initializable {
         }
         return null;
     }
-    private Field getStartingField(String color) {
-        Field startingField = new Field(0,0);
-        switch(color) {
+
+    private void movePawnOutOfBase() {
+        if(isRolled)
+        {
+            Image pawnToMove = getPawnToMove(clickedNode.getId()).getImage();
+            if(clientGame.color.equals("red")) {
+                Node startField = getNodeFromGridPane(GameGrid, 1, 5);
+                ImageView startingField = (ImageView) startField;
+                startingField.setImage(pawnToMove);
+                startField.setId(clickedNode.getId());
+                ImageView clickedPawn = (ImageView) clickedNode;
+                clickedPawn.setImage(null);
+                int pawnNumber = Integer.parseInt(clickedNode.getId().substring(clickedNode.getId().length()-1,clickedNode.getId().length()))-1;
+                clickedNode.setId(null);
+                red.get(pawnNumber).setField(new Field(1,5));
+            }
+            if(clientGame.color.equals("green")) {
+                Node startField = getNodeFromGridPane(GameGrid, 7, 1);
+                ImageView startingField = (ImageView) startField;
+                startingField.setImage(pawnToMove);
+                startField.setId(clickedNode.getId());
+                ImageView clickedPawn = (ImageView) clickedNode;
+                clickedPawn.setImage(null);
+                int pawnNumber = Integer.parseInt(clickedNode.getId().substring(clickedNode.getId().length()-1,clickedNode.getId().length()))-1;
+                green.get(pawnNumber).setField(new Field(7,1));
+                clickedNode.setId(null);
+            }
+            if(clientGame.color.equals("blue")) {
+                Node startField = getNodeFromGridPane(GameGrid, 11, 7);
+                ImageView startingField = (ImageView) startField;
+                startingField.setImage(pawnToMove);
+                startField.setId(clickedNode.getId());
+                ImageView clickedPawn = (ImageView) clickedNode;
+                clickedPawn.setImage(null);
+                int pawnNumber = Integer.parseInt(clickedNode.getId().substring(clickedNode.getId().length()-1,clickedNode.getId().length()))-1;
+                clickedNode.setId(null);
+                blue.get(pawnNumber).setField(new Field(11,7));
+            }
+            if(clientGame.color.equals("yellow")) {
+                Node startField = getNodeFromGridPane(GameGrid, 5, 11);
+                ImageView startingField = (ImageView) startField;
+                startingField.setImage(pawnToMove);
+                startField.setId(clickedNode.getId());
+                ImageView clickedPawn = (ImageView) clickedNode;
+                clickedPawn.setImage(null);
+                int pawnNumber = Integer.parseInt(clickedNode.getId().substring(clickedNode.getId().length()-1,clickedNode.getId().length()))-1;
+                clickedNode.setId(null);
+                yellow.get(pawnNumber).setField(new Field(5,11));
+            }
+            isRolled = false;
+        }
+    }
+
+    private int getCurrentField() {
+        String id = clickedNode.getId();
+        int pawnNumber = Integer.parseInt(clickedNode.getId().substring(id.length()-1,id.length()))-1;
+        int fieldCurrentPosX = 0;
+        int fieldCurrentPosY = 0;
+        switch (clientGame.color) {
             case "red":
-                startingField.setX(fields.get(startingField.RED_START_POINT).getX());
-                startingField.setY(fields.get(startingField.RED_START_POINT).getY());
-                return startingField;
+                fieldCurrentPosX = red.get(pawnNumber).getField().getX();
+                fieldCurrentPosY = red.get(pawnNumber).getField().getY();
+                for(int i=0;i< fields.size();i++) {
+                    if(fieldCurrentPosX == fields.get(i).getX() && fieldCurrentPosY == fields.get(i).getY()) return i;
+                }
             case "green":
-                startingField.setX(fields.get(startingField.GREEN_START_POINT).getX());
-                startingField.setY(fields.get(startingField.GREEN_START_POINT).getY());
-                return startingField;
+                 fieldCurrentPosX = green.get(pawnNumber).getField().getX();
+                 fieldCurrentPosY = green.get(pawnNumber).getField().getY();
+                for(int i=0;i< fields.size();i++) {
+                    if(fieldCurrentPosX == fields.get(i).getX() && fieldCurrentPosY == fields.get(i).getY()) return i;
+                }
             case "blue":
-                startingField.setX(fields.get(startingField.BLUE_START_POINT).getX());
-                startingField.setY(fields.get(startingField.BLUE_START_POINT).getY());
-                return startingField;
+                fieldCurrentPosX = blue.get(pawnNumber).getField().getX();
+                fieldCurrentPosY = blue.get(pawnNumber).getField().getY();
+                for(int i=0;i< fields.size();i++) {
+                    if(fieldCurrentPosX == fields.get(i).getX() && fieldCurrentPosY == fields.get(i).getY()) return i;
+                }
             case "yellow":
-                startingField.setX(fields.get(startingField.YELLOW_START_POINT).getX());
-                startingField.setY(fields.get(startingField.YELLOW_START_POINT).getY());
-                return startingField;
+                fieldCurrentPosX = yellow.get(pawnNumber).getField().getX();
+                fieldCurrentPosY = yellow.get(pawnNumber).getField().getY();
+                for(int i=0;i< fields.size();i++) {
+                    if(fieldCurrentPosX == fields.get(i).getX() && fieldCurrentPosY == fields.get(i).getY()) return i;
+                }
+        }
+        return -1;
+    }
+
+    private Image getPawnImage() {
+        switch(clientGame.color)
+        {
+            case "red":
+                return redImage;
+            case "green":
+                return greenImage;
+            case "blue":
+                return blueImage;
+            case "yellow":
+                return yellowImage;
         }
         return null;
     }
 
     @FXML
-    private void movePawn() {
+    public void movePawn()
+    {
 
     }
 
-    private void movePawnOutOfBase() {
-        Image pawnToMove = getPawnToMove(clickedNode.getId()).getImage();
-        if(clientGame.color.equals("red")) {
-            Node startField = getNodeFromGridPane(GameGrid, 1, 5);
-            ImageView startingField = (ImageView) startField;
-            startingField.setImage(pawnToMove);
-            ImageView clickedPawn = (ImageView) clickedNode;
-            clickedPawn.setImage(null);
-        }
-        if(clientGame.color.equals("green")) {
-            Node startField = getNodeFromGridPane(GameGrid, 7, 1);
-            ImageView startingField = (ImageView) startField;
-            startingField.setImage(pawnToMove);
-            ImageView clickedPawn = (ImageView) clickedNode;
-            clickedPawn.setImage(null);
-        }
-        if(clientGame.color.equals("blue")) {
-            Node startField = getNodeFromGridPane(GameGrid, 11, 7);
-            ImageView startingField = (ImageView) startField;
-            startingField.setImage(pawnToMove);
-            ImageView clickedPawn = (ImageView) clickedNode;
-            clickedPawn.setImage(null);
-        }
-        if(clientGame.color.equals("yellow")) {
-            Node startField = getNodeFromGridPane(GameGrid, 5, 11);
-            ImageView startingField = (ImageView) startField;
-            startingField.setImage(pawnToMove);
-            ImageView clickedPawn = (ImageView) clickedNode;
-            clickedPawn.setImage(null);
-        }
+    private void movePawnForward() {
+        //TODO: NAPRAWIĆ ID, USTAWIA SIĘ NA NULL
+        if(isRolled)
+        {
+            //Image pawnToMove = getPawnToMove(clickedNode.getId()).getImage();
+            System.out.println(clickedNode.getId());
 
+            //Zwracanie Image danego koloru
+            Image pawnToMove = getPawnImage();
+
+            //Pobranie aktualnego pola piona ktorego nacisnelismy
+            int currField = getCurrentField();
+            System.out.println("CURRFIELD: " + currField);
+
+
+            //Wyliczenie wartosci pola na ktore przeniesiemy piona
+            int nextField = currField + random;
+
+            //Utworzenie Field z nowym miejscem piona
+            Field newField = new Field (fields.get(nextField).getX(), fields.get(nextField).getY());
+
+            //Pobranie numery piona - 1 (Liczenie od 0)
+            int pawnNumber = Integer.parseInt(clickedNode.getId().substring(clickedNode.getId().length()-1,clickedNode.getId().length()))-1;
+
+            // Pobranie Node pola do ktorego chcemy sie przeniesc
+            Node next = getNodeFromGridPane(GameGrid, fields.get(nextField).getX(),fields.get(nextField).getY());
+            ImageView fieldToMove = (ImageView) next;
+
+            System.out.println("NEXTFIELD: " + nextField);
+            switch (clientGame.color) {
+                case "red":
+                    if (nextField >= 39) {
+                        newField = redBase.get(baseStats[0]);
+                        red.get(pawnNumber).setField(newField);
+                        baseStats[0]++;
+                        next.setId(clickedNode.getId());
+                        clickedNode.setId(null);
+
+                        // Wyslanie wiadomosci do serwera o przeniesieniu pionka
+                        String message = "pawnMoved," + next.getId() + "," + newField ;
+                        clientGame.sendToServer(message);
+                        isRolled = false;
+                        return;
+                    }
+                case "green":
+                    if(currField < 9 && nextField>=9) {
+                        newField = greenBase.get(baseStats[1]);
+                        green.get(pawnNumber).setField(newField);
+                        baseStats[1]++;
+                        next.setId(clickedNode.getId());
+                        clickedNode.setId(null);
+
+                        // Wyslanie wiadomosci do serwera o przeniesieniu pionka
+                        String message = "pawnMoved," + next.getId() + "," + newField ;
+                        clientGame.sendToServer(message);
+                        isRolled = false;
+                        return;
+                    }
+                    else if(nextField>39) {
+                        nextField-=39;
+                        newField = new Field (fields.get(nextField).getX(), fields.get(nextField).getY());
+                        green.get(pawnNumber).setField(newField);
+                        next.setId(clickedNode.getId());
+                        clickedNode.setId(null);
+                        // Wyslanie wiadomosci do serwera o przeniesieniu pionka
+                        String message = "pawnMoved," + next.getId() + "," + newField ;
+                        clientGame.sendToServer(message);
+                        isRolled = false;
+                        return;
+                    }
+                case "blue":
+                    if(currField < 19 && nextField>=19) {
+                        newField = blueBase.get(baseStats[2]);
+                        blue.get(pawnNumber).setField(newField);
+                        baseStats[2]++;
+                        next.setId(clickedNode.getId());
+                        clickedNode.setId(null);
+
+                        // Wyslanie wiadomosci do serwera o przeniesieniu pionka
+                        String message = "pawnMoved," + next.getId() + "," + newField ;
+                        clientGame.sendToServer(message);
+                        isRolled = false;
+                        return;
+                    }
+                    else if(nextField>39) {
+                        nextField-=39;
+                        newField = new Field (fields.get(nextField).getX(), fields.get(nextField).getY());
+                        blue.get(pawnNumber).setField(newField);
+                        next.setId(clickedNode.getId());
+                        clickedNode.setId(null);
+                        // Wyslanie wiadomosci do serwera o przeniesieniu pionka
+                        String message = "pawnMoved," + next.getId() + "," + newField ;
+                        clientGame.sendToServer(message);
+                        isRolled = false;
+                        return;
+                    }
+                case "yellow":
+                    if(currField < 29 && nextField>=29) {
+                        newField = yellowBase.get(baseStats[3]);
+                        yellow.get(pawnNumber).setField(newField);
+                        baseStats[3]++;
+                        next.setId(clickedNode.getId());
+                        clickedNode.setId(null);
+
+                        // Wyslanie wiadomosci do serwera o przeniesieniu pionka
+                        String message = "pawnMoved," + next.getId() + "," + newField ;
+                        clientGame.sendToServer(message);
+                        isRolled = false;
+                        return;
+                    }
+                    else if(nextField>39) {
+                        nextField-=39;
+                        newField = new Field (fields.get(nextField).getX(), fields.get(nextField).getY());
+                        yellow.get(pawnNumber).setField(newField);
+                        next.setId(clickedNode.getId());
+                        clickedNode.setId(null);
+                        // Wyslanie wiadomosci do serwera o przeniesieniu pionka
+                        String message = "pawnMoved," + next.getId() + "," + newField ;
+                        clientGame.sendToServer(message);
+                        isRolled = false;
+                        return;
+                    }
+            }
+
+
+            //Ustawienie polu na ktore sie przenosimy
+            // Image pionka ktory sie przenosi
+            fieldToMove.setImage(pawnToMove);
+
+            //Skasowanie z pola wczesniejszego Image
+            //Poniewaz zostal juz przeniesiony
+            ImageView clickedPawn = (ImageView) clickedNode;
+            clickedPawn.setImage(null);
+
+            //Ustawienie ID polu na ktore sie przenieslismy
+            //za pomocą ID piona ktory byl na poprzednim polu
+            next.setId(clickedNode.getId());
+
+            switch (clientGame.color) {
+                case "red":
+                        red.get(pawnNumber).setField(newField);
+                case "green":
+                        green.get(pawnNumber).setField(newField);
+                case "blue":
+                        blue.get(pawnNumber).setField(newField);
+                case "yellow":
+                        yellow.get(pawnNumber).setField(newField);
+            }
+
+            clickedNode.setId(null);
+
+            // Wyslanie wiadomosci do serwera o przeniesieniu pionka
+            System.out.println("Daje informacje o przeniesieniu pionka do serwera");
+
+            String message = "pawnMoved," + next.getId() + "," + newField ;
+            clientGame.sendToServer(message);
+            message = "tourEnd";
+            clientGame.sendToServer(message);
+            isRolled = false;
+        }
     }
 
     private void moveClickedPawn()
@@ -381,16 +623,20 @@ public class BoardController implements Initializable {
         }
         // TODO - dodac z powrotem argument do sprawdzenia clientGame.diceRollNumber
 
-        if(isPawnInBase(pawnToMove.getField(), clientGame.color))
+        System.out.println("TUTAJ RANDOM: " + random);
+        if(isPawnInBase(pawnToMove.getField(), clientGame.color) && random==6)
         {
            // pawnToMove.setField(getStartingField(clientGame.color));
-            System.out.println("Wychodze z bazy");
+            System.out.println("TUTAJ WCHODZI PO TYM RANDOMIE: "+random);
             movePawnOutOfBase();
+        }
+        else if(!isPawnInBase(pawnToMove.getField(), clientGame.color)){
+            System.out.println("WCHODZI DO ELSE");
+            movePawnForward();
         }
     }
 
     private ImageView getPawnToMove(String id) {
-        System.out.println(id);
         switch (id) {
             case "red_1":
                 return red_1;

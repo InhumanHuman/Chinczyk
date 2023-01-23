@@ -39,8 +39,10 @@ public class ServerGame {
             ResultSet resultSet = psSelect.executeQuery();
             resultSet.next();
             String usernames = resultSet.getString("names");
+
             String[] unames = usernames.split(",");
             for(int i = 0; i < 2; i++) {
+                System.out.println("USER: " + unames[i]);
                 sockets.put(unames[i],clientList.get(i));
             }
 
@@ -60,6 +62,9 @@ class ServerGameThread extends Thread {
     final String tourEnd = "tourEnd";
     final String diceRoll = "diceRoll";
     final String pawnMoved = "pawnMoved";
+    final String pawnBeaten = "pawnBeaten";
+    final String gameEnded = "gameEnded";
+    boolean gameEndedFlag = false;
     public ServerGameThread(HashMap<String, ClientHandler> sockets) {
         this.sockets = sockets;
     }
@@ -72,49 +77,59 @@ class ServerGameThread extends Thread {
             usernames.add(key);
         }
         int turnNumber = 0;
-        while(true)
+        while(!gameEndedFlag)
         {
             try {
                 // Kogo nasluchujemy
                 int whoToListen = turnNumber % 2;
-                System.out.println("who to listen: " + whoToListen);
 
                 // Nasluchiwanie goscia ktory wszedl jako n-ty
                 String message = sockets.get(usernames.get(whoToListen)).in.readLine();
+                System.out.println("SERVER: UZYSKALEM WIADOMOSC: " + message);
 
                 String[] splitted = message.split(",");
 
-                String newMSG = null;
-
+                sendBroadcast("turnInfo," + whoToListen);
 
                 //PRZYKŁAD : diceRoll,4
                 if(splitted[0].equals(diceRoll))
                 {
-                    newMSG = diceRoll + "," + splitted[1];
+                    String newMSG = diceRoll + "," + splitted[1];
 
                     //Wysłanie broadcast do wszystkich o nowej wartości kości
                     sendBroadcast(newMSG);
 
                 }
-                //PRZYKŁAD: pawnMoved,red_3,15
+                //PRZYKŁAD: pawnMoved,1,2,5,1,3
+                // 1,2 - STARA POZYCJA
+                // 5,1 - NOWA POZYCJA
+                // 3 - ID Gracza
                 if(splitted[0].equals(pawnMoved))
                 {
                     sendBroadcast(message);
-                    System.out.println("PAWNMOVED: \nKtory pionek: " + splitted[1] + "\nKtore pole: " + splitted[2]);
                 }
                 //PRZYKŁAD: tourEnd
                 if (splitted[0].equals(tourEnd))
                 {
                     turnNumber++;
 
-                    newMSG = tourEnd + "," + turnNumber;
+                    String newMSG = tourEnd + "," + turnNumber;
                     sendBroadcast(newMSG);
 
+                }
+                if(splitted[0].equals(pawnBeaten))
+                {
+                    sendBroadcast(message);
+                }
+                if(splitted[0].equals(gameEnded))
+                {
+                    gameEndedFlag = true;
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
+
     }
 
     private void sendBroadcast(String newMSG)

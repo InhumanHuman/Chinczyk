@@ -7,6 +7,7 @@ public class Pawn {
     private boolean inGame;
     private boolean isFinished;
     private Field field;
+    private int passedFields;
 
     public Pawn(String color, String name, Field field) {
         this.color = color;
@@ -15,6 +16,7 @@ public class Pawn {
         this.field = field;
         this.isFinished = false;
         this.inGame = false;
+        this.passedFields = 0;
     }
 
     public String getColor() {
@@ -62,5 +64,13 @@ public class Pawn {
 
     public void setField(Field field) {
         this.field = field;
+    }
+
+    public int getPassedFields() {
+        return passedFields;
+    }
+
+    public void setPassedFields(int passedFields) {
+        this.passedFields = passedFields;
     }
 }

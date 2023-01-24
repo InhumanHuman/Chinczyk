@@ -46,8 +46,6 @@ class ServerThread extends Thread {
     }
 
     public void run() {
-        // TODO - poakzanie przez watek nowemu klientowi klientów ktorzy sa juz w pokojach
-        // TODO - sprawdzanie czy klient juz taki istnieje pdoczas podawania nicku
         String line;
         try {
             this.in = new BufferedReader(new InputStreamReader(this.client.getInputStream()));

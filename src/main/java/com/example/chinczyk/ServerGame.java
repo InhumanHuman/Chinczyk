@@ -8,9 +8,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ServerGame {
+    final int PLAYERS_COUNT = 2;
 
     public ServerGame(int port) {
-        ServerSocket serverSocket = null;
+        ServerSocket serverSocket;
         HashMap<String,ClientHandler> sockets = new HashMap<>();
         ArrayList<ClientHandler> clientList = new ArrayList<>();
         try {
@@ -20,8 +21,7 @@ public class ServerGame {
         }
 
         // Czekanie na 4 graczy
-        for (int i = 0; i < 2; i++) {
-            System.out.println("CZEKAM NA KOGOS");
+        for (int i = 0; i < PLAYERS_COUNT; i++) {
             try {
                 Socket client = serverSocket.accept();
 
@@ -30,7 +30,6 @@ public class ServerGame {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            System.out.println("WSZEDLEM");
         }
         // Wystartowanie gry po dodaniu graczy
         try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ludo_db", "root", "root")) {
@@ -41,8 +40,7 @@ public class ServerGame {
             String usernames = resultSet.getString("names");
 
             String[] unames = usernames.split(",");
-            for(int i = 0; i < 2; i++) {
-                System.out.println("USER: " + unames[i]);
+            for(int i = 0; i < PLAYERS_COUNT; i++) {
                 sockets.put(unames[i],clientList.get(i));
             }
 
@@ -59,12 +57,13 @@ public class ServerGame {
 // Thread do obsługi gry
 class ServerGameThread extends Thread {
     HashMap<String, ClientHandler> sockets;
-    final String tourEnd = "tourEnd";
+    final String turnEnd = "turnEnd";
     final String diceRoll = "diceRoll";
     final String pawnMoved = "pawnMoved";
     final String pawnBeaten = "pawnBeaten";
     final String gameEnded = "gameEnded";
     boolean gameEndedFlag = false;
+    final int PLAYERS_COUNT = 2;
     public ServerGameThread(HashMap<String, ClientHandler> sockets) {
         this.sockets = sockets;
     }
@@ -81,11 +80,10 @@ class ServerGameThread extends Thread {
         {
             try {
                 // Kogo nasluchujemy
-                int whoToListen = turnNumber % 2;
+                int whoToListen = turnNumber % PLAYERS_COUNT;
 
                 // Nasluchiwanie goscia ktory wszedl jako n-ty
                 String message = sockets.get(usernames.get(whoToListen)).in.readLine();
-                System.out.println("SERVER: UZYSKALEM WIADOMOSC: " + message);
 
                 String[] splitted = message.split(",");
 
@@ -109,11 +107,11 @@ class ServerGameThread extends Thread {
                     sendBroadcast(message);
                 }
                 //PRZYKŁAD: tourEnd
-                if (splitted[0].equals(tourEnd))
+                if (splitted[0].equals(turnEnd))
                 {
                     turnNumber++;
 
-                    String newMSG = tourEnd + "," + turnNumber;
+                    String newMSG = turnEnd + "," + turnNumber;
                     sendBroadcast(newMSG);
 
                 }
@@ -136,9 +134,6 @@ class ServerGameThread extends Thread {
     {
         for (String key: sockets.keySet())
         {
-            System.out.println(key);
-            System.out.println(sockets.get(key));
-
             sockets.get(key).out.println(newMSG);
             sockets.get(key).out.flush();
         }

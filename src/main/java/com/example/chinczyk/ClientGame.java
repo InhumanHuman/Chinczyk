@@ -14,12 +14,12 @@ public class ClientGame
     protected BufferedReader in;
     protected String username;
     protected int ID;
-    protected int tourNumber;
+    protected int turnNumber;
     protected int diceRollNumber;
     protected ObservableList<String> DiceValueList = FXCollections.observableArrayList();
     protected ObservableList<String> PawnsValueList = FXCollections.observableArrayList();
     protected ObservableList<String> PawnsBeaten = FXCollections.observableArrayList();
-    protected ObservableList<String> turnEnded = FXCollections.observableArrayList();
+    protected ObservableList<String> TurnEnded = FXCollections.observableArrayList();
     protected Field oldPosition;
     protected Field newPosition;
     protected String color;
@@ -37,10 +37,7 @@ public class ClientGame
     public ClientGame(String hostName, int ip, String username, int ID)
     {
         try {
-            System.out.println(hostName);
-            System.out.println(ip);
             this.client = new Socket(hostName, ip);
-            System.out.println("User joins game session");
             this.in = new BufferedReader(new InputStreamReader(client.getInputStream()));
             this.out = new PrintWriter(client.getOutputStream());
             this.username = username;
@@ -59,7 +56,6 @@ public class ClientGame
 
     public void sendToServer(String message)
     {
-        System.out.println("Wysylam wiadomosc");
         out.println(message);
         out.flush();
     }
@@ -102,17 +98,15 @@ class ClientGameThread extends Thread
 
     @Override
     public void run() {
-        final String tourEnd = "tourEnd";
+        final String turnEnd = "turnEnd";
         final String diceRoll = "diceRoll";
         final String pawnMoved = "pawnMoved";
         final String pawnBeaten = "pawnBeaten";
-        final String turnInfo = "turnInfo";
+        final int PLAYER_COUNT = 2;
         while(true)
         {
             try {
-                System.out.println("czekam na info od serwera" + username);
                 String gotInfo = in.readLine();
-                System.out.println("KLIENT - OTRZYMANA WIADOMOSC: " + gotInfo);
                 String[] splited = gotInfo.split(",");
 
                 if(splited[0].equals(diceRoll))
@@ -120,15 +114,15 @@ class ClientGameThread extends Thread
                     int diceRollNumber = Integer.parseInt(splited[1]);
 
                     clientGame.diceRollNumber = diceRollNumber;
-                    clientGame.DiceValueList.add("diceRoll," + diceRollNumber);
+                    clientGame.DiceValueList.add("UPDATE");
                 }
-                // TODO : określenie kiedy ma być aktualizowana nazwa tury
-                if(splited[0].equals(tourEnd))
+                if(splited[0].equals(turnEnd))
                 {
-                    int tourNumber = Integer.parseInt(splited[1]);
-                    clientGame.tourNumber = tourNumber;
+                    int turnNumber = Integer.parseInt(splited[1]);
+                    clientGame.turnNumber = turnNumber;
+                    clientGame.turnInfo = turnNumber % PLAYER_COUNT;
 
-                    clientGame.turnEnded.add("UPDATE");
+                    clientGame.TurnEnded.add("UPDATE");
                 }
                 if(splited[0].equals(pawnMoved))
                 {
@@ -149,11 +143,6 @@ class ClientGameThread extends Thread
                     clientGame.beatenPawnColor = splited[2];
 
                     clientGame.PawnsBeaten.add("UPDATE");
-                }
-                if(splited[0].equals(turnInfo))
-                {
-                    clientGame.turnInfo = Integer.parseInt(splited[1]);
-                    clientGame.turnEnded.add("UPDATE");
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);

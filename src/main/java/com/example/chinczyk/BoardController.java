@@ -53,6 +53,7 @@ public class BoardController implements Initializable {
     private Node newPositionNode;
     private boolean movingOutOfBase;
     private boolean endGame = false;
+    private final int PLAYERS_COUNT = 2;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -65,12 +66,10 @@ public class BoardController implements Initializable {
 
 
             System.out.println("X: " + clickedPositionX + " | Y: " + clickedPositionY);
-            System.out.println("X REAL: " + e.getX() + " | Y REAL: " + e.getY());
             clickedNode = getNodeFromGridPane(GameGrid, clickedPositionX, clickedPositionY);
 
             if((clickedNode != null) && isRolled)
             {
-                System.out.println("CLICKED NODE: " + clickedNode);
                 color = clickedNode.getId().substring(0,clickedNode.getId().length()-2);
 
                 if(color.equals(clientGame.color) ) {
@@ -155,7 +154,6 @@ public class BoardController implements Initializable {
         {
             if(clickedPawn.isInGame())
             {
-                System.out.println("JESTEM W GRZE, ID: " + clickedPawn.getName());
                 //Rusz go o tyle pul ile zostało wylosowane
                 int fieldNumber = 0;
                 for(Field field : fields)
@@ -249,9 +247,6 @@ public class BoardController implements Initializable {
 
                 System.out.println("NEWFIELD X: " + newField.getX() + " | NEWFIELD Y: " + newField.getY());
 
-                System.out.println("NEW NODE: " + newPositionNode);
-                System.out.println("NEW NODE ID: " + newPositionNode.getId());
-
                 // Wyżej sprawdziliśmy, czy osoba, która jest zbijana
                 // posiada inny kolor, tak więc sprawdzamy wyłącznie
                 // warunek czy przypadkiem pole nie jest puste
@@ -282,7 +277,7 @@ public class BoardController implements Initializable {
                 }
 
 
-                message = "tourEnd";
+                message = "turnEnd";
                 clientGame.sendToServer(message);
 
                 isRolled = false;
@@ -310,9 +305,6 @@ public class BoardController implements Initializable {
             }
         }
         //Przywrócenie wartości startowych
-        System.out.println("POROWNANIE: BEATEN PAWN ID: " + beatenPawn.getName() + " NEWPOSNODE ID: " + newPositionNode.getId());
-        System.out.println("PIONEK: " + beatenPawn.getName() + " CZY W GRZE: " + beatenPawn.isInGame() + " ILE PÓL: " + beatenPawn.getPassedFields());
-
         int numberOfEmptyField = 0;
         ArrayList<Field> tempStartBaseFields = new ArrayList<>();
 
@@ -368,11 +360,11 @@ public class BoardController implements Initializable {
         String message;
         if(!isRolled)
         {
-            turnNumber = clientGame.tourNumber;
-            if(turnNumber % 2 == userID) {
+            turnNumber = clientGame.turnNumber;
+            if(turnNumber % PLAYERS_COUNT == userID) {
                 isRolled = true;
 
-                random = 6;
+                random = diceRoll();
 
                 // Jeżeli wylosowana liczba != 6 i żadnego
                 // piona nie ma w grze - STAN KOSTKI + KONIEC TURY
@@ -383,7 +375,7 @@ public class BoardController implements Initializable {
                     clientGame.sendToServer(message);
 
                     //Wysłanie informacji o końcu tury
-                    message = "tourEnd";
+                    message = "turnEnd";
                     clientGame.sendToServer(message);
 
                     isRolled = false;
@@ -450,12 +442,11 @@ public class BoardController implements Initializable {
 
 
         userID = clientGame.getID();
-        System.out.println("Board : " + userID);
 
         clientGame.DiceValueList.addListener((ListChangeListener<String>) change -> updateDice(clientGame.diceRollNumber));
         clientGame.PawnsValueList.addListener((ListChangeListener<String>) change -> updatePawns());
         clientGame.PawnsBeaten.addListener((ListChangeListener<String>) change -> updateBeaten());
-        clientGame.turnEnded.addListener((ListChangeListener<String>) change -> Platform.runLater(() -> turnInfo.setText("Turn: " + colorNames[clientGame.turnInfo])));
+        clientGame.TurnEnded.addListener((ListChangeListener<String>) change -> Platform.runLater(() -> turnInfo.setText("Turn: " + colorNames[clientGame.turnInfo])));
     }
 
     private void updateBeaten() {
@@ -575,7 +566,6 @@ public class BoardController implements Initializable {
             oldPosition.setId(null);
             ((ImageView) oldPosition).setImage(null);
         }
-        System.out.println(clientGame.turnInfo);
     }
 
     @FXML
